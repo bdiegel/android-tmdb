@@ -1,0 +1,129 @@
+package com.honu.tmdb;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.honu.tmdb.rest.ApiError;
+import com.honu.tmdb.rest.MovieResponse;
+import com.honu.tmdb.rest.MovieService;
+import com.honu.tmdb.rest.ReviewResponse;
+import com.honu.tmdb.rest.VideoResponse;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+
+/**
+ *
+ */
+public class MovieDbApi {
+
+    private static MovieDbApi sInstance;
+
+    private static String sApiKey;
+
+    private static MovieService sService;
+
+    // service endpoint
+    static final String ENDPOINT = "http://api.themoviedb.org/3";
+
+    static final String TAG = MovieDbApi.class.getSimpleName();
+
+
+    public MovieDbApi(@NonNull String apiKey) {
+        this.sApiKey = apiKey;
+    }
+
+
+    public interface MovieListener {
+        public void success(MovieResponse response);
+        public void error(ApiError error);
+    }
+
+
+    public interface VideoListener {
+        public void success(VideoResponse response);
+        public void error(ApiError error);
+    }
+
+
+    public interface ReviewListener {
+        public void success(ReviewResponse response);
+        public void error(ApiError error);
+    }
+
+
+    public static MovieDbApi getInstance(@NonNull String apiKey) {
+
+        if (sInstance == null) {
+            sInstance = new MovieDbApi(apiKey);
+        }
+
+        return sInstance;
+    }
+
+
+    public void requestMostPopularMovies(@Nullable final MovieListener listener) {
+
+        getMovieService().fetchPopularMovies(sApiKey, new Callback<MovieResponse>() {
+            @Override
+            public void success(MovieResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of movies found: " + response.getMovies().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
+    public void requestHighestRatedMovies(@Nullable final MovieListener listener) {
+
+        getMovieService().fetchHighestRatedMovies(sApiKey, new Callback<MovieResponse>() {
+            @Override
+            public void success(MovieResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of movies found: " + response.getMovies().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
+
+    private MovieService getMovieService() {
+
+        if (sService == null ) {
+            Gson gson = new GsonBuilder().create();
+
+            RestAdapter.Builder builder = new RestAdapter.Builder()
+                  .setEndpoint(ENDPOINT)
+                  .setConverter(new GsonConverter(gson))
+                  .setLogLevel(RestAdapter.LogLevel.FULL);
+
+            sService = builder.build().create(MovieService.class);
+        }
+
+        return sService;
+    }
+}

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Movie Database</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="sort_popularity">popularity</string>
+    <string name="sort_rating">rating</string>
+</resources>
