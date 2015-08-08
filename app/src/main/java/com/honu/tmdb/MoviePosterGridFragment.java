@@ -1,5 +1,6 @@
 package com.honu.tmdb;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -107,27 +108,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     }
 
 
-    class MovieGridItemViewHolder extends RecyclerView.ViewHolder {
-
-        @Bind(R.id.movie_title)
-        TextView movieTitle;
-
-        @Bind(R.id.movie_poster)
-        ImageView moviePoster;
-
-        public MovieGridItemViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @OnClick(R.id.movie_poster)
-        public void onClick() {
-            Log.d(TAG, "Show movie details ...");
-        }
-    }
-
-
-    class MovieGridRecyclerAdapter extends RecyclerView.Adapter<MovieGridItemViewHolder> {
+    class MovieGridRecyclerAdapter extends RecyclerView.Adapter<MovieGridRecyclerAdapter.MovieGridItemViewHolder> {
 
         List<Movie> data = new ArrayList<>();
 
@@ -154,6 +135,37 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         @Override
         public int getItemCount() {
             return data.size();
+        }
+
+        class MovieGridItemViewHolder extends RecyclerView.ViewHolder {
+
+            @Bind(R.id.movie_title)
+            TextView movieTitle;
+
+            @Bind(R.id.movie_poster)
+            ImageView moviePoster;
+
+            public MovieGridItemViewHolder(View itemView) {
+                super(itemView);
+                ButterKnife.bind(this, itemView);
+            }
+
+            @OnClick(R.id.movie_poster)
+            public void onClick() {
+                //int position = this.getLayoutPosition();
+                //Log.d(TAG, "LayoutPosition: " + position);
+                int adapterPosition = this.getAdapterPosition();
+                Log.d(TAG, "AdapterPosition: " + adapterPosition);
+                Movie movie = data.get(adapterPosition);
+                openDetails(movie);
+            }
+
+            private void openDetails(Movie movie) {
+                Log.d(TAG, "Show movie details: " + movie.getTitle());
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+                intent.putExtra("movie", movie);
+                getActivity().startActivity(intent);
+            }
         }
     }
 }

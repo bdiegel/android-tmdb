@@ -1,11 +1,14 @@
 package com.honu.tmdb.rest;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  *
  */
-public class Movie {
+public class Movie implements Parcelable {
 
     @SerializedName("id")
     int id;
@@ -63,6 +66,9 @@ public class Movie {
     // recommended for most phones:
     static final String SIZE_DEFAULT = SIZE_W185;
 
+    public Movie() {
+    }
+
     public int getId() {
         return id;
     }
@@ -73,6 +79,10 @@ public class Movie {
 
     public String getBackdropPath() {
         return backdropPath;
+    }
+
+    public String getBackdropUrl() {
+        return BASE_IMG_URL + SIZE_W185 + backdropPath;
     }
 
     public int[] getGenreIds() {
@@ -122,4 +132,54 @@ public class Movie {
     public int getVoteCount() {
         return voteCount;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeByte(isAdult ? (byte) 1 : (byte) 0);
+        dest.writeString(this.backdropPath);
+        dest.writeIntArray(this.genreIds);
+        dest.writeString(this.originalLanguage);
+        dest.writeString(this.originalTitle);
+        dest.writeString(this.overview);
+        dest.writeString(this.releaseDate);
+        dest.writeString(this.posterPath);
+        dest.writeFloat(this.popularity);
+        dest.writeString(this.title);
+        dest.writeByte(isVideo ? (byte) 1 : (byte) 0);
+        dest.writeFloat(this.voteAverage);
+        dest.writeInt(this.voteCount);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readInt();
+        this.isAdult = in.readByte() != 0;
+        this.backdropPath = in.readString();
+        this.genreIds = in.createIntArray();
+        this.originalLanguage = in.readString();
+        this.originalTitle = in.readString();
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.posterPath = in.readString();
+        this.popularity = in.readFloat();
+        this.title = in.readString();
+        this.isVideo = in.readByte() != 0;
+        this.voteAverage = in.readFloat();
+        this.voteCount = in.readInt();
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
