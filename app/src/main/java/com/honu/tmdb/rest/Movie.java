@@ -54,17 +54,23 @@ public class Movie implements Parcelable {
 
     static final String BASE_IMG_URL = "http://image.tmdb.org/t/p/";
 
-    // Image sizes
-    static final String SIZE_W92 = "w92";
-    static final String SIZE_W154 = "w154";
-    static final String SIZE_W185 = "w185";
-    static final String SIZE_W342 = "w342";
-    static final String SIZE_W500 = "w500";
-    static final String W780 = "w780";
-    static final String SIZE_ORIGINAL = "original";
+    // Poster image sizes
+    static final String POSTER_SIZE_W92 = "w92";
+    static final String POSTER_SIZE_W154 = "w154";
+    static final String POSTER_SIZE_W185 = "w185";
+    static final String POSTER_SIZE_W342 = "w342";
+    static final String POSTER_SIZE_W500 = "w500";
+    static final String POSTER_W780 = "w780";
+    static final String POSTER_SIZE_ORIGINAL = "original";
+
+    // Backdrop image sizes
+    static final String BACKDROP_SIZE_W300 = "w300";
+    static final String BACKDROP_SIZE_W780 = "w780";
+    static final String BACKDROP_SIZE_W1280 = "w1280";
+    static final String BACKDROP_SIZE_ORIGINAL = "original";
 
     // recommended for most phones:
-    static final String SIZE_DEFAULT = SIZE_W185;
+    static final String SIZE_DEFAULT = POSTER_SIZE_W185;
 
     public Movie() {
     }
@@ -82,7 +88,7 @@ public class Movie implements Parcelable {
     }
 
     public String getBackdropUrl() {
-        return BASE_IMG_URL + SIZE_W185 + backdropPath;
+        return BASE_IMG_URL + BACKDROP_SIZE_W300 + backdropPath;
     }
 
     public int[] getGenreIds() {
@@ -110,7 +116,7 @@ public class Movie implements Parcelable {
     }
 
     public String getPosterUrl() {
-        return BASE_IMG_URL + SIZE_W185 + posterPath;
+        return BASE_IMG_URL + POSTER_SIZE_W185 + posterPath;
     }
 
     public float getPopularity() {
