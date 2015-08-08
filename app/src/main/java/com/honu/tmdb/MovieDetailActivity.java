@@ -30,9 +30,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Bind(R.id.movie_detail_poster)
     ImageView mPosterView;
 
-    @Bind(R.id.movie_detail_title)
-    TextView mTitleView;
-
     @Bind(R.id.movie_detail_rating)
     TextView mRatingView;
 
@@ -66,10 +63,9 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Log.d(TAG, "Backdrop url: " + mMovie.getBackdropUrl());
         Picasso.with(this).load(mMovie.getBackdropUrl()).into(mPosterView);
-        mTitleView.setText(mMovie.getTitle());
         mRatingView.setText(""+mMovie.getVoteAverage());
         mReleaseView.setText(mMovie.getReleaseDate());
-        mSynopsisView.setText(mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview());
+        mSynopsisView.setText(mMovie.getOverview());
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) this.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mMovie.getTitle());

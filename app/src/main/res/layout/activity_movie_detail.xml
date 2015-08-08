@@ -53,6 +53,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        style="@style/FabStyle"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:layout_anchor="@+id/app_bar_layout"
+        app:layout_anchorGravity="bottom|right|end"/>
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
@@ -71,27 +78,30 @@
                       android:paddingTop="@dimen/activity_vertical_margin">
 
             <TextView
-                android:id="@+id/movie_detail_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/hello_world"/>
-
-            <TextView
                 android:id="@+id/movie_detail_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textStyle="bold"
                 android:text="@string/hello_world"/>
 
             <TextView
                 android:id="@+id/movie_detail_release"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textAppearance="?android:textAppearanceSmall"
                 android:text="@string/hello_world"/>
 
             <TextView
                 android:id="@+id/movie_detail_synopsis"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textAppearance="?android:textAppearanceLarge"
                 android:text="@string/hello_world"/>
 
         </LinearLayout>
