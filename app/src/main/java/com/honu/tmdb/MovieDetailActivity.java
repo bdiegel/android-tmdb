@@ -1,38 +1,84 @@
 package com.honu.tmdb;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.honu.tmdb.rest.Movie;
+import com.squareup.picasso.Picasso;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
+    static final String TAG = MovieDetailActivity.class.getSimpleName();
+
     private static final String KEY_MOVIE = "movie";
+
+    Movie mMovie;
+
+    @Bind(R.id.movie_detail_poster)
+    ImageView mPosterView;
+
+    @Bind(R.id.movie_detail_title)
+    TextView mTitleView;
+
+    @Bind(R.id.movie_detail_rating)
+    TextView mRatingView;
+
+    @Bind(R.id.movie_detail_release)
+    TextView mReleaseView;
+
+    @Bind(R.id.movie_detail_synopsis)
+    TextView mSynopsisView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        Movie movie = intent.getParcelableExtra(KEY_MOVIE);
+        mMovie = intent.getParcelableExtra(KEY_MOVIE);
+
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelable(KEY_MOVIE, movie);
+
+//        if (savedInstanceState == null ) {
+//            Fragment fragment = new MovieDetailFragment();
+//            fragment.setArguments(bundle);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.replace(R.id.container, fragment).commit();
+//        }
+
+        setStatusBarTransparent();
+        ButterKnife.bind(this);
+
+        Log.d(TAG, "Backdrop url: " + mMovie.getBackdropUrl());
+        Picasso.with(this).load(mMovie.getBackdropUrl()).into(mPosterView);
+        mTitleView.setText(mMovie.getTitle());
+        mRatingView.setText(""+mMovie.getVoteAverage());
+        mReleaseView.setText(mMovie.getReleaseDate());
+        mSynopsisView.setText(mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview() + mMovie.getOverview());
+
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) this.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(mMovie.getTitle());
+    }
 
 
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_MOVIE, movie);
-        //fragment.setArguments(bundle);
-
-        if (savedInstanceState == null ) {
-            Fragment fragment = new MovieDetailFragment();
-            fragment.setArguments(bundle);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.container, fragment).commit();
-        }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setStatusBarTransparent() {
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
     }
 
 
