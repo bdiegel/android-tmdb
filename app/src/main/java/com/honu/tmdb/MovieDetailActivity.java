@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +48,11 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mMovie = intent.getParcelableExtra(KEY_MOVIE);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
 //        Bundle bundle = new Bundle();
 //        bundle.putParcelable(KEY_MOVIE, movie);
