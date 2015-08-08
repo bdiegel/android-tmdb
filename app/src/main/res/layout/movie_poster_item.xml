@@ -18,7 +18,7 @@
         android:id="@+id/movie_title"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="#AF000000"
+        android:background="#88000000"
         android:textColor="#f1f1f1"
         android:gravity="bottom"
         android:layout_gravity="bottom"/>
