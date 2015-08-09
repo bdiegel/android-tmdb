@@ -31,4 +31,6 @@ public interface MovieService {
     // Movie reviews
     @GET("/movie/{id}/reviews")
     void fetchReviews(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<ReviewResponse> cb);
+
+    // http://api.themoviedb.org/3/movie/{movie_id}?api_key=your_key&append_to_response=trailers,reviews
 }
