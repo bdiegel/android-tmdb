@@ -22,5 +22,5 @@
         <item name="pressedTranslationZ">12dp</item>
         <item name="rippleColor">@android:color/white</item>
     </style>
-
+    <!--<item name="android:src">@drawable/fab_favorite_icons</item>-->
 </resources>
