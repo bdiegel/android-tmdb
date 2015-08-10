@@ -119,7 +119,8 @@ public class MovieDbApi {
             RestAdapter.Builder builder = new RestAdapter.Builder()
                   .setEndpoint(ENDPOINT)
                   .setConverter(new GsonConverter(gson))
-                  .setLogLevel(RestAdapter.LogLevel.FULL);
+                  .setLogLevel(RestAdapter.LogLevel.BASIC);
+                  //.setLogLevel(RestAdapter.LogLevel.FULL);
 
             sService = builder.build().create(MovieService.class);
         }
