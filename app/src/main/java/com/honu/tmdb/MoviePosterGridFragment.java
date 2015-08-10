@@ -12,8 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
@@ -37,10 +40,12 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     @Bind(R.id.recycler)
     RecyclerView mRecyclerView;
 
+    Spinner mSortSpinner;
+
     MovieDbApi mApi;
     MovieGridRecyclerAdapter mAdapter;
 
-    //int mSortBy = R.id.sort_popularity;
+    int mSortMethod = SortOption.POPULARITY;
 
     public MoviePosterGridFragment() {
     }
@@ -71,28 +76,33 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.movie_poster_grid, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.spin_test);
+
+        // specify layout for the action
+        menuItem.setActionView(R.layout.sort_spinner);
+        View view = menuItem.getActionView();
+
+        // set custom adapter on spinner
+        mSortSpinner = (Spinner) view.findViewById(R.id.spinner_nav);
+        mSortSpinner.setAdapter(new SortSpinnerAdapter(this, getActivity(), SortOption.getSortOptions()));
+        mSortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                handleSortSelection(SortOption.getSortMethod(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.sort_popularity:
-                if (!item.isChecked()) {
-                    item.setChecked(false);
-                    mApi.requestMostPopularMovies(this);
-                }
-                return true;
-            case R.id.sort_rating:
-                if (!item.isChecked()) {
-                    item.setChecked(false);
-                    mApi.requestHighestRatedMovies(this);
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        Log.d(TAG, "Options menu item selected: " + item.getItemId());
+        return true;
     }
 
 
@@ -104,7 +114,27 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     @Override
     public void error(ApiError error) {
-//                    Log.d(TAG, error.getReason());
+        Log.d(TAG, error.getReason());
+    }
+
+    public void handleSortSelection(int sortType) {
+        if (mSortMethod == sortType)
+            return;
+
+        mSortMethod = sortType;
+
+        switch (sortType) {
+            case SortOption.POPULARITY:
+                mApi.requestMostPopularMovies(this);
+                return;
+            case SortOption.RATING:
+                mApi.requestHighestRatedMovies(this);
+                return;
+            default:
+                // TODO: P2 - add support for Favorites
+                Toast.makeText(getActivity(), "Sort type not supported", Toast.LENGTH_SHORT).show();
+                return;
+        }
     }
 
 
@@ -152,8 +182,6 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
             @OnClick(R.id.movie_poster)
             public void onClick() {
-                //int position = this.getLayoutPosition();
-                //Log.d(TAG, "LayoutPosition: " + position);
                 int adapterPosition = this.getAdapterPosition();
                 Log.d(TAG, "AdapterPosition: " + adapterPosition);
                 Movie movie = data.get(adapterPosition);
@@ -168,4 +196,5 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             }
         }
     }
+
 }

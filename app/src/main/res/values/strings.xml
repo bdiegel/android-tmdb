@@ -5,4 +5,5 @@
     <string name="sort_popularity">popularity</string>
     <string name="sort_rating">rating</string>
     <string name="title_activity_movie_detail">MovieDetailActivity</string>
+    <string name="settings">settings</string>
 </resources>

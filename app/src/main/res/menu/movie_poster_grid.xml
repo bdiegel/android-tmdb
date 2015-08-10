@@ -3,13 +3,16 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
 
-      <group android:checkableBehavior="single">
-            <item android:id="@+id/sort_popularity"
-                  android:title="@string/sort_popularity"
-                  android:checked="true"
-                  />
-            <item android:id="@+id/sort_rating"
-                  android:title="@string/sort_rating" />
-      </group>
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings"/>
+
+    <item
+        android:id="@+id/spin_test"
+        android:actionViewClass="android.widget.Spinner"
+        android:icon="@drawable/ic_trending_up_white_24dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:title="test"
+        app:showAsAction="always"/>
 
 </menu>
