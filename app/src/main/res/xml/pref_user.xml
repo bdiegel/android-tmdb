@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="@string/key_sort_method_pref"
+        android:title="@string/pref_preferred_sort_method"
+        android:summary="The default method used to sort movies: "
+        android:dialogTitle="Select sort method:"
+        android:defaultValue="0"
+        android:entries="@array/pref_sort_method_titles"
+        android:entryValues="@array/pref_sort_method_values"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
+</PreferenceScreen>
