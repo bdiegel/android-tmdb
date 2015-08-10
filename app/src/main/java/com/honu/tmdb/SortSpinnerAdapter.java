@@ -36,7 +36,7 @@ class SortSpinnerAdapter extends ArrayAdapter<SortOption> implements SpinnerAdap
             convertView = moviePosterGridFragment.getLayoutInflater(null).inflate(R.layout.sort_spinner_item, null);
         }
         ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
-        imageView.setImageDrawable(ResourcesCompat.getDrawable(moviePosterGridFragment.getResources(), option.itemDrawable, null));
+        imageView.setImageDrawable(ResourcesCompat.getDrawable(moviePosterGridFragment.getResources(), option.getItemDrawable(), null));
 
         return convertView;
     }
@@ -51,8 +51,8 @@ class SortSpinnerAdapter extends ArrayAdapter<SortOption> implements SpinnerAdap
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
         TextView textView = (TextView) convertView.findViewById(R.id.text);
-        imageView.setImageDrawable(ResourcesCompat.getDrawable(moviePosterGridFragment.getResources(), option.dropdownDrawable, null));
-        textView.setText(option.text);
+        imageView.setImageDrawable(ResourcesCompat.getDrawable(moviePosterGridFragment.getResources(), option.getDropdownDrawable(), null));
+        textView.setText(option.getText());
 
         return convertView;
     }

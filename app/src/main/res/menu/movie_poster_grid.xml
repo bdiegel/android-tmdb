@@ -4,10 +4,6 @@
       tools:context=".MainActivity">
 
     <item
-        android:id="@+id/settings"
-        android:title="@string/settings"/>
-
-    <item
         android:id="@+id/spin_test"
         android:actionViewClass="android.widget.Spinner"
         android:icon="@drawable/ic_trending_up_white_24dp"

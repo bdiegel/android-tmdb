@@ -28,9 +28,9 @@ class SortOption {
 
     public static List<SortOption> getSortOptions() {
         if (options.isEmpty()) {
-            options.add(new SortOption(POPULARITY, "popularity", R.drawable.ic_trending_up_white_24dp, R.drawable.ic_trending_up_black_24dp));
-            options.add(new SortOption(RATING, "rating", R.drawable.ic_star_white_24dp, R.drawable.ic_star_border_black_24dp));
-            options.add(new SortOption(FAVORITE, "favorites", R.drawable.ic_favorite_white_24dp, R.drawable.ic_favorite_border_black_24dp));
+            options.add(new SortOption(POPULARITY, "most popular", R.drawable.ic_trending_up_white_24dp, R.drawable.ic_trending_up_black_24dp));
+            options.add(new SortOption(RATING, "highest rated", R.drawable.ic_star_white_24dp, R.drawable.ic_star_border_black_24dp));
+            //options.add(new SortOption(FAVORITE, "my favorites", R.drawable.ic_favorite_white_24dp, R.drawable.ic_favorite_border_black_24dp));
         }
         return options;
     }

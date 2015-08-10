@@ -60,16 +60,37 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 3));
 
+        // restore last sort method on orientation change or default to user sort preference
+        if (savedInstanceState != null) {
+            //mSortMethod = savedInstanceState.getInt(AppPreferences.SORT_METHOD_CURRENT);
+            mSortMethod = AppPreferences.getCurrentSortMethod(getActivity());
+        } else {
+            mSortMethod = AppPreferences.getPreferredSortMethod(getActivity());
+        }
+
+        // request movies
         mApi = MovieDbApi.getInstance(getString(R.string.tmdb_api_key));
-        mApi.requestMostPopularMovies(this);
+        if (mSortMethod == SortOption.POPULARITY) {
+            mApi.requestMostPopularMovies(this);
+        } else {
+            mApi.requestHighestRatedMovies(this);
+        }
 
         return view;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putInt(AppPreferences.SORT_METHOD_CURRENT, mSortMethod);
     }
 
 
@@ -86,9 +107,11 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         // set custom adapter on spinner
         mSortSpinner = (Spinner) view.findViewById(R.id.spinner_nav);
         mSortSpinner.setAdapter(new SortSpinnerAdapter(this, getActivity(), SortOption.getSortOptions()));
+        mSortSpinner.setSelection(mSortMethod);
         mSortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                AppPreferences.setCurrentSortMethod(getActivity(), position);
                 handleSortSelection(SortOption.getSortMethod(position));
             }
 
@@ -158,7 +181,6 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         public void onBindViewHolder(MovieGridItemViewHolder holder, int position) {
             Movie movie = data.get(position);
             holder.movieTitle.setText(movie.getTitle());
-            Log.d(TAG, "Rating: " + movie.getVoteAverage());
             Picasso.with(holder.moviePoster.getContext()).load(movie.getPosterUrl()).into(holder.moviePoster);
         }
 
