@@ -37,7 +37,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     static final String TAG = MoviePosterGridFragment.class.getSimpleName();
 
-    static final String STATE_MOVIES = "movies";
+    static final String KEY_MOVIES = "movies";
 
     @Bind(R.id.recycler)
     RecyclerView mRecyclerView;
@@ -63,7 +63,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         // restore movie list from instance state on orientation change
         if (savedInstanceState != null) {
             mSortMethod = AppPreferences.getCurrentSortMethod(getActivity());
-            movies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
+            movies = savedInstanceState.getParcelableArrayList(KEY_MOVIES);
         } else {
             mSortMethod = AppPreferences.getPreferredSortMethod(getActivity());
         }
@@ -99,7 +99,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(STATE_MOVIES, mAdapter.data);
+        outState.putParcelableArrayList(KEY_MOVIES, mAdapter.data);
     }
 
 
@@ -190,7 +190,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         public void onBindViewHolder(MovieGridItemViewHolder holder, int position) {
             Movie movie = data.get(position);
             holder.movieTitle.setText(movie.getTitle());
-            Picasso.with(holder.moviePoster.getContext()).load(movie.getPosterUrl()).into(holder.moviePoster);
+            int screenWidth = getResources().getDisplayMetrics().widthPixels;
+            Picasso.with(holder.moviePoster.getContext()).load(movie.getPosterUrl(screenWidth)).into(holder.moviePoster);
         }
 
         @Override

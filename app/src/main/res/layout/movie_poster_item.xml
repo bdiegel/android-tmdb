@@ -4,15 +4,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:minHeight="200dp"
+    android:maxHeight="400dp"
     >
 
     <ImageView
+        tools:src="@drawable/ic_star_border_black_24dp"
         android:id="@+id/movie_poster"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:scaleType="centerCrop"
-        android:minHeight="200dp"
-        android:minWidth="200dp"
+        android:adjustViewBounds="true"
         android:layout_gravity="center_horizontal"
         />
 

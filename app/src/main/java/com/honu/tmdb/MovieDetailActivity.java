@@ -9,7 +9,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -75,8 +74,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         setStatusBarTransparent();
         ButterKnife.bind(this);
 
-        Log.d(TAG, "Backdrop url: " + mMovie.getBackdropUrl());
-        Picasso.with(this).load(mMovie.getBackdropUrl()).into(mPosterView);
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        Picasso.with(this).load(mMovie.getBackdropUrl(screenWidth)).into(mPosterView);
         mRatingView.setText(""+mMovie.getVoteAverage());
         mReleaseView.setText(mMovie.getReleaseDate());
         mSynopsisView.setText(mMovie.getOverview());
