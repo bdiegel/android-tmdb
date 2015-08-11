@@ -175,6 +175,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         ArrayList<Movie> data = new ArrayList<>();
 
         public void setData(List<Movie> data) {
+            this.data.clear();
             this.data.addAll(data);
             this.notifyDataSetChanged();
         }
