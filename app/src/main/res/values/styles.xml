@@ -12,6 +12,13 @@
         <item name="android:windowBackground">@color/window_background</item>
     </style>
 
+    <!-- Settings activity theme. -->
+    <style name="SettingsTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
     <style name="FabStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -22,5 +29,5 @@
         <item name="pressedTranslationZ">12dp</item>
         <item name="rippleColor">@android:color/white</item>
     </style>
-
+    <!--<item name="android:src">@drawable/fab_favorite_icons</item>-->
 </resources>

@@ -54,11 +54,12 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.FloatingActionButton
-        style="@style/FabStyle"
+        android:id="@+id/fab_favorite"
         android:clickable="true"
         app:fabSize="normal"
         app:layout_anchor="@+id/app_bar_layout"
-        app:layout_anchorGravity="bottom|right|end"/>
+        app:layout_anchorGravity="bottom|right|end"
+        style="@style/FabStyle"/>
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"
