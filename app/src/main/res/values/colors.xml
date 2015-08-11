@@ -11,7 +11,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
-
+    <color name="grey_700">#646464</color>
     <color name="window_background">#FFF5F5F5</color>
 
 </resources>

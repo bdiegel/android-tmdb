@@ -32,6 +32,9 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     boolean mIsFavorite = false;
 
+    @Bind(R.id.movie_detail_backdrop)
+    ImageView mBackdropView;
+
     @Bind(R.id.movie_detail_poster)
     ImageView mPosterView;
 
@@ -75,7 +78,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        Picasso.with(this).load(mMovie.getBackdropUrl(screenWidth)).into(mPosterView);
+        Picasso.with(this).load(mMovie.getBackdropUrl(screenWidth)).into(mBackdropView);
+        Picasso.with(this).load(mMovie.getPosterUrl(screenWidth)).into(mPosterView);
         mRatingView.setText(""+mMovie.getVoteAverage());
         mReleaseView.setText(mMovie.getReleaseDate());
         mSynopsisView.setText(mMovie.getOverview());
