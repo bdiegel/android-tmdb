@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +48,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Bind(R.id.movie_detail_synopsis)
     TextView mSynopsisView;
 
+    @Bind(R.id.movie_genres)
+    TextView mGenres;
+
     @Bind(R.id.fab_favorite)
     FloatingActionButton mFavoriteFab;
 
@@ -80,9 +84,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
         Picasso.with(this).load(mMovie.getBackdropUrl(screenWidth)).into(mBackdropView);
         Picasso.with(this).load(mMovie.getPosterUrl(screenWidth)).into(mPosterView);
-        mRatingView.setText(""+mMovie.getVoteAverage());
+        mRatingView.setText("" + mMovie.getVoteAverage());
         mReleaseView.setText(mMovie.getReleaseDate());
         mSynopsisView.setText(mMovie.getOverview());
+        mGenres.setText(TextUtils.join(", ", mMovie.getMovieGenres()).toUpperCase());
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) this.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mMovie.getTitle());

@@ -115,6 +115,19 @@
                     android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/movie_genres"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@+id/movie_star"
+                    android:layout_alignLeft="@+id/movie_star"
+                    android:fontFamily="sans-serif-light"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textStyle="bold"/>
+
+                <TextView
                     android:id="@+id/movie_detail_release"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -4,6 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.honu.tmdb.MovieGenre;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -100,6 +104,17 @@ public class Movie implements Parcelable {
 
     public int[] getGenreIds() {
         return genreIds;
+    }
+
+    public List<String> getMovieGenres() {
+        List<String> genres = new ArrayList<>();
+        for (int i=0; i<genreIds.length; i++) {
+            MovieGenre genre = MovieGenre.getById(genreIds[i]);
+            if (genre != null) {
+                genres.add(genre.getTitle());
+            }
+        }
+        return genres;
     }
 
     public String getOriginalLanguage() {
