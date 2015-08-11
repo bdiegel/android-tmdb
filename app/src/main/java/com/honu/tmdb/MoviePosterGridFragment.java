@@ -37,6 +37,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     static final String TAG = MoviePosterGridFragment.class.getSimpleName();
 
+    static final String STATE_MOVIES = "movies";
+
     @Bind(R.id.recycler)
     RecyclerView mRecyclerView;
 
@@ -56,24 +58,31 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         View view = inflater.inflate(R.layout.movie_poster_grid, null);
         ButterKnife.bind(this, view);
 
-        mAdapter = new MovieGridRecyclerAdapter();
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 3));
+        ArrayList<Movie> movies = new ArrayList<>();
 
-        // restore last sort method on orientation change or default to user sort preference
+        // restore movie list from instance state on orientation change
         if (savedInstanceState != null) {
-            //mSortMethod = savedInstanceState.getInt(AppPreferences.SORT_METHOD_CURRENT);
             mSortMethod = AppPreferences.getCurrentSortMethod(getActivity());
+            movies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
         } else {
             mSortMethod = AppPreferences.getPreferredSortMethod(getActivity());
         }
 
-        // request movies
+        mAdapter = new MovieGridRecyclerAdapter();
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setData(movies);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 3));
+
+        // initialize api
         mApi = MovieDbApi.getInstance(getString(R.string.tmdb_api_key));
-        if (mSortMethod == SortOption.POPULARITY) {
-            mApi.requestMostPopularMovies(this);
-        } else {
-            mApi.requestHighestRatedMovies(this);
+
+        // request movies
+        if (mAdapter.getItemCount() == 0) {
+            if (mSortMethod == SortOption.POPULARITY) {
+                mApi.requestMostPopularMovies(this);
+            } else {
+                mApi.requestHighestRatedMovies(this);
+            }
         }
 
         return view;
@@ -90,7 +99,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putInt(AppPreferences.SORT_METHOD_CURRENT, mSortMethod);
+        outState.putParcelableArrayList(STATE_MOVIES, mAdapter.data);
     }
 
 
@@ -163,10 +172,10 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     class MovieGridRecyclerAdapter extends RecyclerView.Adapter<MovieGridRecyclerAdapter.MovieGridItemViewHolder> {
 
-        List<Movie> data = new ArrayList<>();
+        ArrayList<Movie> data = new ArrayList<>();
 
         public void setData(List<Movie> data) {
-            this.data = data;
+            this.data.addAll(data);
             this.notifyDataSetChanged();
         }
 
