@@ -91,6 +91,13 @@ public class Movie implements Parcelable {
         return BASE_IMG_URL + BACKDROP_SIZE_W300 + backdropPath;
     }
 
+    public String getBackdropUrl(int screenWidth) {
+        if (screenWidth >= 1024) {
+            return BASE_IMG_URL + BACKDROP_SIZE_W780 + backdropPath;
+        }
+        return BASE_IMG_URL + BACKDROP_SIZE_W300 + backdropPath;
+    }
+
     public int[] getGenreIds() {
         return genreIds;
     }
@@ -116,6 +123,13 @@ public class Movie implements Parcelable {
     }
 
     public String getPosterUrl() {
+        return BASE_IMG_URL + POSTER_SIZE_W185 + posterPath;
+    }
+
+    public String getPosterUrl(int screenWidth) {
+        if (screenWidth >= 1024) {
+            return BASE_IMG_URL + POSTER_SIZE_W342 + posterPath;
+        }
         return BASE_IMG_URL + POSTER_SIZE_W185 + posterPath;
     }
 
