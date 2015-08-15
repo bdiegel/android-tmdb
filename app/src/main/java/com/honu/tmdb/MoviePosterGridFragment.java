@@ -1,6 +1,6 @@
 package com.honu.tmdb;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -39,7 +39,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     static final String KEY_MOVIES = "movies";
 
-    @Bind(R.id.recycler)
+    @Bind(R.id.recycler_container)
     RecyclerView mRecyclerView;
 
     Spinner mSortSpinner;
@@ -48,6 +48,14 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     MovieGridRecyclerAdapter mAdapter;
 
     int mSortMethod = SortOption.POPULARITY;
+
+    // communicates selection events back to listener
+    OnMovieSelectedListener mListener;
+
+    // interface to communicate movie selection events to MainActivity
+    public interface OnMovieSelectedListener {
+        public void onMovieSelected(Movie selection);
+    }
 
     public MoviePosterGridFragment() {
     }
@@ -137,6 +145,22 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         return true;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnMovieSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnMovieSelectedListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
 
     @Override
     public void success(MovieResponse response) {
@@ -217,14 +241,9 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             public void onClick() {
                 int adapterPosition = this.getAdapterPosition();
                 Movie movie = data.get(adapterPosition);
-                openDetails(movie);
-            }
-
-            private void openDetails(Movie movie) {
-                Log.d(TAG, "Show movie details: " + movie.getTitle());
-                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                intent.putExtra("movie", movie);
-                getActivity().startActivity(intent);
+                if (mListener != null) {
+                    mListener.onMovieSelected(movie);
+                }
             }
         }
     }
