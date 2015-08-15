@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 public class Review {
 
     @SerializedName("id")
-    int id;
+    String id;
 
     @SerializedName("author")
     String author;
@@ -19,7 +19,7 @@ public class Review {
     @SerializedName("url")
     String url;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
