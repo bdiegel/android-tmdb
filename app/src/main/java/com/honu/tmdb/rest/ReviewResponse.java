@@ -2,6 +2,7 @@ package com.honu.tmdb.rest;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,6 +34,8 @@ public class ReviewResponse {
     }
 
     public List<Review> getReviews() {
+        if (reviews == null)
+            return Collections.emptyList();
         return reviews;
     }
 

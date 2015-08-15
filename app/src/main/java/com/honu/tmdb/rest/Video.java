@@ -9,7 +9,7 @@ public class Video {
 
 
     @SerializedName("id")
-    int id;
+    String id;
 
     // ie, "en"
     @SerializedName("iso_639_1")
@@ -32,7 +32,7 @@ public class Video {
     @SerializedName("type")
     String type;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -58,5 +58,9 @@ public class Video {
 
     public String getType() {
         return type;
+    }
+
+    public boolean isYoutubeTrailer() {
+        return (site.toLowerCase().equals("youtube") && type.toLowerCase().equals("trailer"));
     }
 }

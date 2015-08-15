@@ -216,7 +216,6 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             @OnClick(R.id.movie_poster)
             public void onClick() {
                 int adapterPosition = this.getAdapterPosition();
-                Log.d(TAG, "AdapterPosition: " + adapterPosition);
                 Movie movie = data.get(adapterPosition);
                 openDetails(movie);
             }

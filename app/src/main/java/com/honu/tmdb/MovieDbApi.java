@@ -110,6 +110,47 @@ public class MovieDbApi {
         });
     }
 
+    public void requestMovieReviews(@NonNull int movieId, @Nullable final ReviewListener listener) {
+
+        getMovieService().fetchReviews(movieId, sApiKey, new Callback<ReviewResponse>() {
+            @Override
+            public void success(ReviewResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of reviews found: " + response.getReviews().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
+    public void requestMovieVideos(@NonNull int movieId, @Nullable final VideoListener listener) {
+
+        getMovieService().fetchVideos(movieId, sApiKey, new Callback<VideoResponse>() {
+            @Override
+            public void success(VideoResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of reviews found: " + response.getVideos().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
 
     private MovieService getMovieService() {
 
