@@ -26,7 +26,7 @@ public interface MovieService {
 
     // Video trailers, clips, etc
     @GET("/movie/{id}/videos")
-    void fetchTrailers(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<VideoResponse> cb);
+    void fetchVideos(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<VideoResponse> cb);
 
     // Movie reviews
     @GET("/movie/{id}/reviews")
