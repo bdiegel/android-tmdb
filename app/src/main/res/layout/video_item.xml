@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingBottom="8dp"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="8dp"
+              android:weightSum="1">
+
+    <View style="@style/Divider"/>
+
+    <TextView
+        android:id="@+id/review_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="normal"
+        tools:text="Medium Text"
+        />
+
+    <!--android:fontFamily="sans-serif-light"-->
+
+    <TextView
+        android:id="@+id/review_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.07"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="italic"
+        tools:text="Medium Text"
+        />
+
+</LinearLayout>
