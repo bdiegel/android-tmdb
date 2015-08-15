@@ -202,6 +202,13 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             this.data.clear();
             this.data.addAll(data);
             this.notifyDataSetChanged();
+            notifyMovieSelectionListener();
+        }
+
+        public void notifyMovieSelectionListener() {
+            if (mListener != null && !data.isEmpty()) {
+                mListener.onMovieSelected(data.get(0));
+            }
         }
 
         @Override
