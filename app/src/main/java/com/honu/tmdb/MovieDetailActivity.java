@@ -23,7 +23,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MovieDetailActivity extends AppCompatActivity  { //implements MovieDbApi.ReviewListener, MovieDbApi.VideoListener {
+public class MovieDetailActivity extends AppCompatActivity  {
 
     static final String TAG = MovieDetailActivity.class.getSimpleName();
 
