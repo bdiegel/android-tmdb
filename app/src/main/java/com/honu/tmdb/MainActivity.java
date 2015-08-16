@@ -17,7 +17,12 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
     static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final String KEY_MOVIE = "movie";
+
     boolean mTwoPaneMode = false;
+
+    // remember the selected movie
+    Movie mSelectedMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +38,16 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             //toolbar.setNavigationIcon(R.mipmap.ic_launcher);
         }
 
+        if (savedInstanceState != null) {
+            mSelectedMovie = savedInstanceState.getParcelable(KEY_MOVIE);
+        }
+
         if (findViewById(R.id.fragment_detail) != null) {
             mTwoPaneMode = true;
+            if (mSelectedMovie != null) {
+                TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
+                titleView.setText(mSelectedMovie.getTitle());
+            }
         }
     }
 
@@ -62,9 +75,17 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_MOVIE, mSelectedMovie);
+    }
+
+    @Override
     public void onMovieSelected(Movie movie) {
 
         Log.d(TAG, "Show movie details: " + movie.getTitle());
+
+        mSelectedMovie = movie;
 
         if (mTwoPaneMode) {
             Bundle bundle = new Bundle();
