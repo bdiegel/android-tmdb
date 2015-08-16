@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.honu.tmdb.rest.Movie;
 
@@ -70,8 +71,11 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             bundle.putParcelable(MovieDetailFragment.KEY_MOVIE, movie);
             Fragment fragment = MovieDetailFragment.newInstance(movie);
             fragment.setArguments(bundle);
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_detail, fragment).commit();
+            TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
+            titleView.setText(movie.getTitle());
         } else {
             Intent intent = new Intent(this, MovieDetailActivity.class);
             intent.putExtra("movie", movie);
