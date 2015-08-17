@@ -2,7 +2,6 @@ package com.honu.tmdb;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +18,8 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
     private static final String KEY_MOVIE = "movie";
 
+    private static final String TAG_DETAIL_FRAGMENT = "fragment_details";
+
     boolean mTwoPaneMode = false;
 
     // remember the selected movie
@@ -28,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("MainActivity", "onCreateView");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -38,16 +38,13 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             //toolbar.setNavigationIcon(R.mipmap.ic_launcher);
         }
 
+
         if (savedInstanceState != null) {
             mSelectedMovie = savedInstanceState.getParcelable(KEY_MOVIE);
         }
 
-        if (findViewById(R.id.fragment_detail) != null) {
+        if (findViewById(R.id.content_split) != null) {
             mTwoPaneMode = true;
-            if (mSelectedMovie != null) {
-                TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
-                titleView.setText(mSelectedMovie.getTitle());
-            }
         }
     }
 
@@ -76,30 +73,55 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_MOVIE, mSelectedMovie);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onMovieSelected(Movie movie) {
+    protected void onPause() {
+        super.onPause();
 
-        Log.d(TAG, "Show movie details: " + movie.getTitle());
+        if (getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT) != null) {
+            MovieDetailFragment fragment = (MovieDetailFragment)
+                  getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.remove(fragment).commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSelectedMovie != null && findViewById(R.id.movie_detail_title) != null) {
+            onMovieSelected(mSelectedMovie, false);
+        }
+    }
+
+    @Override
+    public void onMovieSelected(Movie movie, boolean onClick) {
+        Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
 
         mSelectedMovie = movie;
 
         if (mTwoPaneMode) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(MovieDetailFragment.KEY_MOVIE, movie);
-            Fragment fragment = MovieDetailFragment.newInstance(movie);
-            fragment.setArguments(bundle);
+            MovieDetailFragment fragment = (MovieDetailFragment)
+                  getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_detail, fragment).commit();
+            if (fragment == null || fragment.mMovie.getId() != mSelectedMovie.getId()) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MovieDetailFragment.KEY_MOVIE, movie);
+                fragment = MovieDetailFragment.newInstance(movie);
+                fragment.setArguments(bundle);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_detail, fragment, TAG_DETAIL_FRAGMENT).commit();
+            }
+
             TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
             titleView.setText(movie.getTitle());
-        } else {
+
+        } else if (onClick) {
             Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtra("movie", movie);
+            intent.putExtra(MovieDetailActivity.KEY_MOVIE, movie);
             this.startActivity(intent);
         }
     }

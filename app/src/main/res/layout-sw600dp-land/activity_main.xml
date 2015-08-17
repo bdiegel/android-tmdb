@@ -19,7 +19,7 @@
         <!--android:divider="?android:attr/dividerHorizontal"-->
 
         <fragment
-            android:id="@+id/fragment_master"
+            android:id="@+id/fragment_grid"
             android:name="com.honu.tmdb.MoviePosterGridFragment"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"

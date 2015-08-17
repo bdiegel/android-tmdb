@@ -54,10 +54,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     // interface to communicate movie selection events to MainActivity
     public interface OnMovieSelectedListener {
-        public void onMovieSelected(Movie selection);
-    }
-
-    public MoviePosterGridFragment() {
+        public void onMovieSelected(Movie selection, boolean onClick);
     }
 
     @Override
@@ -106,10 +103,9 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_MOVIES, mAdapter.data);
+        super.onSaveInstanceState(outState);
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -157,8 +153,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     @Override
     public void onDetach() {
-        super.onDetach();
         mListener = null;
+        super.onDetach();
     }
 
 
@@ -207,7 +203,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         public void notifyMovieSelectionListener() {
             if (mListener != null && !data.isEmpty()) {
-                mListener.onMovieSelected(data.get(0));
+                mListener.onMovieSelected(data.get(0), false);
             }
         }
 
@@ -249,7 +245,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
                 int adapterPosition = this.getAdapterPosition();
                 Movie movie = data.get(adapterPosition);
                 if (mListener != null) {
-                    mListener.onMovieSelected(movie);
+                    mListener.onMovieSelected(movie, true);
                 }
             }
         }

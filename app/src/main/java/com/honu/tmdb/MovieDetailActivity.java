@@ -27,7 +27,7 @@ public class MovieDetailActivity extends AppCompatActivity  {
 
     static final String TAG = MovieDetailActivity.class.getSimpleName();
 
-    private static final String KEY_MOVIE = "movie";
+    public static final String KEY_MOVIE = "movie";
 
     Movie mMovie;
 
