@@ -205,7 +205,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                 viewType =  REVIEW_VIEW_TYPE;
             }
 
-            Log.d(TAG, "getItemViewType - position:" + position + " type: " + viewType);
+            //Log.d(TAG, "getItemViewType - position:" + position + " type: " + viewType);
             return viewType;
         }
 
