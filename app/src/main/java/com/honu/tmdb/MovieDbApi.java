@@ -136,7 +136,7 @@ public class MovieDbApi {
         getMovieService().fetchVideos(movieId, sApiKey, new Callback<VideoResponse>() {
             @Override
             public void success(VideoResponse response, Response httpResponse) {
-                Log.d(TAG, "Number of reviews found: " + response.getVideos().size());
+                Log.d(TAG, "Total number of videos found: " + response.getVideos().size());
                 if (listener != null) {
                     listener.success(response);
                 }
