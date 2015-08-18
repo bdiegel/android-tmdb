@@ -5,14 +5,16 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.honu.tmdb.data.MovieContract.MovieEntry;
 import com.honu.tmdb.data.MovieContract.MovieGenreEntry;
 
 public class MovieProvider extends ContentProvider {
+
+    static final String TAG = MovieProvider.class.getSimpleName();
 
     private MovieDatabaseHelper mDbHelper;
 
@@ -32,17 +34,15 @@ public class MovieProvider extends ContentProvider {
         return matcher;
     }
 
-    private static final SQLiteQueryBuilder sMoviesWithGenresQueryBuilder = new SQLiteQueryBuilder();
-
-    static {
-        sMoviesWithGenresQueryBuilder.setTables(
-              MovieEntry.TABLE_NAME + " INNER JOIN " + MovieGenreEntry.TABLE_NAME +
-                    " ON " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID +
-                    " = " + MovieGenreEntry.TABLE_NAME + "." + MovieGenreEntry.COLUMN_MOVIE_ID
-        );
-    }
-
-    private static final String sSelectByMovieId = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+//    private static final SQLiteQueryBuilder sMoviesWithGenresQueryBuilder = new SQLiteQueryBuilder();
+//
+//    static {
+//        sMoviesWithGenresQueryBuilder.setTables(
+//              MovieEntry.TABLE_NAME + " LEFT JOIN " + MovieGenreEntry.TABLE_NAME +
+//                    " ON " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID +
+//                    " = " + MovieGenreEntry.TABLE_NAME + "." + MovieGenreEntry.COLUMN_MOVIE_ID
+//        );
+//    }
 
     public MovieProvider() {
     }
@@ -50,6 +50,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mDbHelper = new MovieDatabaseHelper(getContext());
+        Log.d(TAG, "MovieProvider created");
         return true;
     }
 
@@ -72,6 +73,7 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        Log.d(TAG, "insert uri: " + uri);
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long id = -1;
 
@@ -98,14 +100,14 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        int numberOfRowsAffected = 0;
-        String id = uri.getLastPathSegment();
+        int numberOfRowsAffected = 0;;
 
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
                 numberOfRowsAffected = db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case MOVIE_ID:
+                String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     numberOfRowsAffected = db.update(MovieEntry.TABLE_NAME,
                           values,
@@ -122,16 +124,17 @@ public class MovieProvider extends ContentProvider {
                 numberOfRowsAffected = db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case GENRE_ID:
+                String id2 = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     numberOfRowsAffected = db.update(MovieGenreEntry.TABLE_NAME,
                           values,
                           MovieGenreEntry._ID + " = ? ",
-                          new String[]{id});
+                          new String[]{id2});
                 } else {
                     numberOfRowsAffected = db.update(MovieGenreEntry.TABLE_NAME,
                           values,
                           selection + " AND " + MovieGenreEntry._ID + " = ? ",
-                          appendToSelectionArgs(selectionArgs, id));
+                          appendToSelectionArgs(selectionArgs, id2));
                 }
                 break;
             default:
@@ -149,13 +152,13 @@ public class MovieProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int numberOfRowsAffected = 0;
-        String id = uri.getLastPathSegment();
 
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
                 numberOfRowsAffected = db.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case MOVIE_ID:
+                String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     numberOfRowsAffected = db.delete(MovieEntry.TABLE_NAME,
                           MovieEntry._ID + " = ? ",
@@ -171,14 +174,15 @@ public class MovieProvider extends ContentProvider {
                 numberOfRowsAffected = db.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case GENRE_ID:
+                String id2 = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     numberOfRowsAffected = db.delete(MovieGenreEntry.TABLE_NAME,
                           MovieGenreEntry._ID + " = ? ",
-                          new String[]{id});
+                          new String[]{id2});
                 } else {
                     numberOfRowsAffected = db.delete(MovieGenreEntry.TABLE_NAME,
                           selection + " AND " + MovieGenreEntry._ID + " = ? ",
-                          appendToSelectionArgs(selectionArgs, id));
+                          appendToSelectionArgs(selectionArgs, id2));
                 }
                 break;
             default:
@@ -194,12 +198,19 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String id = uri.getLastPathSegment();
         Cursor retCursor;
+        Log.d(TAG, "query uri: " + uri);
 
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
-                retCursor = getMoviesWithGenres(uri, projection, selection, sortOrder);
+                //retCursor = getMoviesWithGenres(uri, projection, selection, selectionArgs, sortOrder);
+                retCursor = db.query(MovieEntry.TABLE_NAME,
+                      projection,
+                      selection,
+                      selectionArgs,
+                      "",
+                      "",
+                      sortOrder);
                 break;
             case GENRE:
                 retCursor = db.query(MovieGenreEntry.TABLE_NAME,
@@ -211,6 +222,7 @@ public class MovieProvider extends ContentProvider {
                       sortOrder);
                 break;
             case MOVIE_ID:
+                String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     retCursor = db.query(MovieEntry.TABLE_NAME,
                           projection,
@@ -230,11 +242,12 @@ public class MovieProvider extends ContentProvider {
                 }
                 break;
             case GENRE_ID:
+                String id2 = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     retCursor = db.query(MovieGenreEntry.TABLE_NAME,
                           projection,
                           MovieGenreEntry._ID + " = ? ",
-                          new String[]{id},
+                          new String[]{id2},
                           "",
                           "",
                           sortOrder);
@@ -242,7 +255,7 @@ public class MovieProvider extends ContentProvider {
                     retCursor = db.query(MovieGenreEntry.TABLE_NAME,
                           projection,
                           selection + " AND " + MovieGenreEntry._ID + " = ? ",
-                          appendToSelectionArgs(selectionArgs, id),
+                          appendToSelectionArgs(selectionArgs, id2),
                           "",
                           "",
                           sortOrder);
@@ -256,18 +269,19 @@ public class MovieProvider extends ContentProvider {
         return retCursor;
     }
 
-    private Cursor getMoviesWithGenres(Uri uri, String[] projection, String selection, String sortOrder) {
-        String movieIdSetting = MovieContract.MovieEntry.getIdFromUri(uri);
-
-        return sMoviesWithGenresQueryBuilder.query(mDbHelper.getReadableDatabase(),
-              projection,
-              selection,
-              new String[]{movieIdSetting},
-              null,
-              null,
-              sortOrder
-        );
-    }
+//    private Cursor getMoviesWithGenres(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+//        //String movieIdSetting = MovieContract.MovieEntry.getIdFromUri(uri);
+//
+//        return sMoviesWithGenresQueryBuilder.query(mDbHelper.getReadableDatabase(),
+//              projection,
+//              selection,
+//              selectionArgs,
+//              //new String[]{movieIdSetting},
+//              null,
+//              null,
+//              sortOrder
+//        );
+//    }
 
     private String[] appendToSelectionArgs(String[] selectionArgs, String appendArg) {
         String[] allArgs = new String[selectionArgs.length + 1];

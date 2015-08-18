@@ -1,6 +1,7 @@
 package com.honu.tmdb;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.honu.tmdb.data.MovieContract;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.MovieResponse;
@@ -182,14 +184,33 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             case SortOption.RATING:
                 mApi.requestHighestRatedMovies(this);
                 return;
+            case SortOption.FAVORITE:
+                queryFavorites();
+                return;
             default:
-                // TODO: P2 - add support for Favorites
                 Toast.makeText(getActivity(), "Sort type not supported", Toast.LENGTH_SHORT).show();
                 return;
         }
     }
 
+    private void queryFavorites() {
+        Log.d(TAG, "Query favorites");
+        Cursor cursor = this.getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+              new String[]{"*"},
+              MovieContract.MovieEntry.SELECT_FAVORITES,
+              null,
+              null);
 
+        // TODO: add results to adapter
+        Log.d(TAG, "Cursor count: " + cursor.getCount());
+
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
+            int movieId = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
+            Log.d(TAG, "title: " + title + " id: " + movieId);
+        }
+    }
+    
     class MovieGridRecyclerAdapter extends RecyclerView.Adapter<MovieGridRecyclerAdapter.MovieGridItemViewHolder> {
 
         ArrayList<Movie> data = new ArrayList<>();

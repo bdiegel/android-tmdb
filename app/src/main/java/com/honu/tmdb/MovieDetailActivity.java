@@ -114,5 +114,7 @@ public class MovieDetailActivity extends AppCompatActivity  {
         mIsFavorite = !mIsFavorite;
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
         MovieFavorites.updateFavorite(this, mIsFavorite, mMovie.getId());
+        if (mIsFavorite)
+            MovieFavorites.addFavorite(this, mMovie);
     }
 }
