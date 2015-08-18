@@ -34,16 +34,6 @@ public class MovieProvider extends ContentProvider {
         return matcher;
     }
 
-//    private static final SQLiteQueryBuilder sMoviesWithGenresQueryBuilder = new SQLiteQueryBuilder();
-//
-//    static {
-//        sMoviesWithGenresQueryBuilder.setTables(
-//              MovieEntry.TABLE_NAME + " LEFT JOIN " + MovieGenreEntry.TABLE_NAME +
-//                    " ON " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID +
-//                    " = " + MovieGenreEntry.TABLE_NAME + "." + MovieGenreEntry.COLUMN_MOVIE_ID
-//        );
-//    }
-
     public MovieProvider() {
     }
 
@@ -203,7 +193,6 @@ public class MovieProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
-                //retCursor = getMoviesWithGenres(uri, projection, selection, selectionArgs, sortOrder);
                 retCursor = db.query(MovieEntry.TABLE_NAME,
                       projection,
                       selection,
@@ -268,20 +257,6 @@ public class MovieProvider extends ContentProvider {
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
-
-//    private Cursor getMoviesWithGenres(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-//        //String movieIdSetting = MovieContract.MovieEntry.getIdFromUri(uri);
-//
-//        return sMoviesWithGenresQueryBuilder.query(mDbHelper.getReadableDatabase(),
-//              projection,
-//              selection,
-//              selectionArgs,
-//              //new String[]{movieIdSetting},
-//              null,
-//              null,
-//              sortOrder
-//        );
-//    }
 
     private String[] appendToSelectionArgs(String[] selectionArgs, String appendArg) {
         String[] allArgs = new String[selectionArgs.length + 1];
