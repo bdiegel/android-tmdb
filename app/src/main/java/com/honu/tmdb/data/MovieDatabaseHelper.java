@@ -43,10 +43,10 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
               "UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID +") ON CONFLICT IGNORE " +
               ");";
 
-        final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE " + MovieGenreEntry.TABLE_NAME + " (" +
               MovieGenreEntry._ID + " INTEGER PRIMARY KEY," +
               MovieGenreEntry.COLUMN_GENRE_ID + " INTEGER NOT NULL, " +
-              MovieGenreEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+              MovieGenreEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL " +
               ");";
 
         // create tables:
