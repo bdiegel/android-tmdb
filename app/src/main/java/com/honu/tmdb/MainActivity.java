@@ -2,6 +2,8 @@ package com.honu.tmdb;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +14,10 @@ import android.widget.TextView;
 
 import com.honu.tmdb.rest.Movie;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity implements  MoviePosterGridFragment.OnMovieSelectedListener {
 
     static final String TAG = MainActivity.class.getSimpleName();
@@ -20,15 +26,22 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
     private static final String TAG_DETAIL_FRAGMENT = "fragment_details";
 
+    boolean mIsFavorite = false;
+
     boolean mTwoPaneMode = false;
 
     // remember the selected movie
     Movie mSelectedMovie;
 
+    @Nullable
+    @Bind(R.id.fab_favorite)
+    FloatingActionButton mFavoriteFab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -41,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
         if (savedInstanceState != null) {
             mSelectedMovie = savedInstanceState.getParcelable(KEY_MOVIE);
+            mIsFavorite = MovieFavorites.isFavoriteMovie(this, mSelectedMovie.getId());
         }
 
         if (findViewById(R.id.content_split) != null) {
@@ -102,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
         Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
 
         mSelectedMovie = movie;
+        mIsFavorite = MovieFavorites.isFavoriteMovie(this, mSelectedMovie.getId());
 
         if (mTwoPaneMode) {
             MovieDetailFragment fragment = (MovieDetailFragment)
@@ -114,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
                 fragment.setArguments(bundle);
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_detail, fragment, TAG_DETAIL_FRAGMENT).commit();
+                mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
             }
 
             TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
@@ -124,5 +140,15 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             intent.putExtra(MovieDetailActivity.KEY_MOVIE, movie);
             this.startActivity(intent);
         }
+    }
+
+    @Nullable @OnClick(R.id.fab_favorite) void onFavoriteClicked() {
+        toggleFavorite();
+    }
+
+    private void toggleFavorite() {
+        mIsFavorite = !mIsFavorite;
+        mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
+        MovieFavorites.updateFavorite(this, mIsFavorite, mSelectedMovie.getId());
     }
 }

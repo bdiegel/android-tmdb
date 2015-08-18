@@ -13,6 +13,9 @@ import java.util.Set;
  */
 public final class MovieFavorites {
 
+    private static int IMG_RESOURCE_IS_FAVORITE = R.drawable.ic_favorite_white_24dp;
+    private static int IMG_RESOURCE_NOT_FAVORITE = R.drawable.ic_favorite_border_white_24dp;
+
     private static final String LOG_TAG = MovieFavorites.class.getSimpleName();
 
     static final String PREF_FILE_NAME = "FavoriteMovies";
@@ -68,5 +71,20 @@ public final class MovieFavorites {
             sFavoriteMovies.remove(sFavoriteMovies.indexOf(movieId));
             removeFavoriteMoviePreference(context, movieId);
         }
+    }
+
+    public static void updateFavorite(Context context, boolean isFavorite, int movieId) {
+        if (isFavorite) {
+            MovieFavorites.addFavoriteMovie(context, movieId);
+        } else {
+            MovieFavorites.removeFavoriteMovie(context, movieId);
+        }
+    }
+
+    public static int getImageResourceId(boolean isFavorite) {
+        if (isFavorite) {
+            return IMG_RESOURCE_IS_FAVORITE;
+        }
+        return IMG_RESOURCE_NOT_FAVORITE;
     }
 }

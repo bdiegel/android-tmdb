@@ -71,7 +71,7 @@ public class MovieDetailActivity extends AppCompatActivity  {
         mIsFavorite = MovieFavorites.isFavoriteMovie(this, mMovie.getId());
 
         // set image if favorite
-        updateFabIcon();
+        mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -112,23 +112,7 @@ public class MovieDetailActivity extends AppCompatActivity  {
 
     private void toggleFavorite() {
         mIsFavorite = !mIsFavorite;
-        updateFabIcon();
-        updateFavorites();
-    }
-
-    private void updateFabIcon() {
-        if (mIsFavorite) {
-            mFavoriteFab.setImageResource(R.drawable.ic_favorite_white_24dp);
-        } else {
-            mFavoriteFab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
-        }
-    }
-
-    private void updateFavorites() {
-        if (mIsFavorite) {
-            MovieFavorites.addFavoriteMovie(this, mMovie.getId());
-        } else {
-            MovieFavorites.removeFavoriteMovie(this, mMovie.getId());
-        }
+        mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
+        MovieFavorites.updateFavorite(this, mIsFavorite, mMovie.getId());
     }
 }
