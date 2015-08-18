@@ -35,8 +35,9 @@
         <provider
             android:name=".data.MovieProvider"
             android:authorities="com.honu.tmdb"
-            android:enabled="false"
-            android:exported="false" >
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="false">
         </provider>
     </application>
 
