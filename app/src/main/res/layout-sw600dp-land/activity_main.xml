@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <LinearLayout
+        android:id="@+id/content_split"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <!--android:divider="?android:attr/dividerHorizontal"-->
+
+        <fragment
+            android:id="@+id/fragment_grid"
+            android:name="com.honu.tmdb.MoviePosterGridFragment"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:layout="@layout/movie_poster_grid"/>
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/movie_detail_title"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/primary_light"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                tools:text="Movie Title"
+                />
+
+            <android.support.design.widget.CoordinatorLayout
+                android:id="@+id/root_coordinator"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <FrameLayout
+                    android:id="@+id/fragment_detail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_favorite"
+                    style="@style/FabStyle"
+                    android:clickable="true"
+                    android:src="@drawable/ic_favorite_border_white_24dp"
+                    app:fabSize="normal"
+                    app:layout_anchor="@+id/fragment_detail"
+                    app:layout_anchorGravity="bottom|right|end"
+                    app:layout_behavior="com.honu.tmdb.view.ScrollAwareFabBehavior"
+                    />
+
+            </android.support.design.widget.CoordinatorLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>
