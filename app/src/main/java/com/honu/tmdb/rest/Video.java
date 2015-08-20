@@ -1,5 +1,7 @@
 package com.honu.tmdb.rest;
 
+import android.net.Uri;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -62,5 +64,9 @@ public class Video {
 
     public boolean isYoutubeTrailer() {
         return (site.toLowerCase().equals("youtube") && type.toLowerCase().equals("trailer"));
+    }
+
+    public Uri getYoutubUrl() {
+        return Uri.parse("http://www.youtube.com/watch?v=" + getKey());
     }
 }
