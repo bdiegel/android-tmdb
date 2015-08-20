@@ -59,6 +59,8 @@ public class MovieContract {
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GENRE;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GENRE;
 
+        public static final String WHERE_MOVIE_ID = MovieGenreEntry.TABLE_NAME + "." + MovieGenreEntry.COLUMN_MOVIE_ID + " = ? ";
+
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
