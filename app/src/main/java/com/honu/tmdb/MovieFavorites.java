@@ -1,8 +1,11 @@
 package com.honu.tmdb;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
 import com.honu.tmdb.data.MovieContract;
@@ -43,7 +46,7 @@ public final class MovieFavorites {
     private static void saveFavoriteMoviePreference(Context context, int movieId) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("id-"+ movieId, movieId).commit();
+        editor.putInt("id-" + movieId, movieId).commit();
     }
 
     private static void removeFavoriteMoviePreference(Context context, int movieId) {
@@ -78,11 +81,13 @@ public final class MovieFavorites {
         }
     }
 
-    public static void updateFavorite(Context context, boolean isFavorite, int movieId) {
+    public static void updateFavorite(Context context, boolean isFavorite, Movie movie) {
         if (isFavorite) {
-            MovieFavorites.addFavoriteMovie(context, movieId);
+            addFavoriteMovie(context, movie.getId());
+            addFavorite(context, movie);
         } else {
-            MovieFavorites.removeFavoriteMovie(context, movieId);
+            removeFavoriteMovie(context, movie.getId());
+            removeFavorite(context, movie);
         }
     }
 
@@ -105,7 +110,17 @@ public final class MovieFavorites {
         values.put(MovieContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
         values.put(MovieContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
 
-        context.getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
+        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
+        handler.startInsert(2, null, MovieContract.MovieEntry.CONTENT_URI, values);
+    }
+
+    public static void removeFavorite(Context context, Movie movie) {
+        Log.d(TAG, "Removing favorite: " + movie.getTitle());
+        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
+        handler.startDelete(2, null,
+              MovieContract.MovieEntry.CONTENT_URI,
+              MovieContract.MovieEntry.WHERE_MOVIE_ID,
+              new String[]{"" + movie.getId()});
     }
 
     public static int getImageResourceId(boolean isFavorite) {
@@ -113,5 +128,23 @@ public final class MovieFavorites {
             return IMG_RESOURCE_IS_FAVORITE;
         }
         return IMG_RESOURCE_NOT_FAVORITE;
+    }
+
+    static class AsyncCrudHandler extends AsyncQueryHandler {
+        public AsyncCrudHandler(ContentResolver cr) {
+            super(cr);
+        }
+
+        @Override
+        protected void onInsertComplete(int token, Object cookie, Uri uri) {
+            super.onInsertComplete(token, cookie, uri);
+            Log.d(TAG, "Insert completed for uri: " + uri);
+        }
+
+        @Override
+        protected void onDeleteComplete(int token, Object cookie, int result) {
+            super.onDeleteComplete(token, cookie, result);
+            Log.d(TAG, "Delete completed with result: " + result);
+        }
     }
 }

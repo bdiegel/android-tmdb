@@ -1,7 +1,12 @@
 package com.honu.tmdb;
 
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -92,6 +97,9 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             }
         }
 
+        // check for network connection
+        checkNetwork();
+
         return view;
     }
 
@@ -136,7 +144,6 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         });
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "Options menu item selected: " + item.getItemId());
@@ -165,10 +172,12 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         mAdapter.setData(response.getMovies());
     }
 
-
     @Override
     public void error(ApiError error) {
-        Log.d(TAG, error.getReason());
+        if (error.isNetworkError()) {
+            Toast.makeText(getActivity(), "Unable to connect to remote host", Toast.LENGTH_LONG).show();
+        }
+        Log.d(TAG, error.toString());
     }
 
     public void handleSortSelection(int sortType) {
@@ -195,20 +204,28 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     private void queryFavorites() {
         Log.d(TAG, "Query favorites");
-        Cursor cursor = this.getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+        FavoritesQueryHandler handler = new FavoritesQueryHandler(getActivity().getContentResolver());
+
+        handler.startQuery(1, null, MovieContract.MovieEntry.CONTENT_URI,
               new String[]{"*"},
               MovieContract.MovieEntry.SELECT_FAVORITES,
               null,
-              null);
+              null
+        );
+    }
 
-        // TODO: add results to adapter
-        Log.d(TAG, "Cursor count: " + cursor.getCount());
-
-        while (cursor.moveToNext()) {
-            String title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
-            int movieId = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
-            Log.d(TAG, "title: " + title + " id: " + movieId);
+    private boolean checkNetwork() {
+        if (!isNetworkAvailable()) {
+            Toast.makeText(getActivity(), "Network unavailable (check your connection)", Toast.LENGTH_LONG).show();
+            return true;
         }
+        return false;
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
     
     class MovieGridRecyclerAdapter extends RecyclerView.Adapter<MovieGridRecyclerAdapter.MovieGridItemViewHolder> {
@@ -240,7 +257,12 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             Movie movie = data.get(position);
             holder.movieTitle.setText(movie.getTitle());
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
-            Picasso.with(holder.moviePoster.getContext()).load(movie.getPosterUrl(screenWidth)).into(holder.moviePoster);
+            //Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
+            Picasso.with(holder.moviePoster.getContext())
+                  .load(movie.getPosterUrl(screenWidth))
+                  .placeholder(R.drawable.ic_image_white_36dp)
+                  .error(R.drawable.ic_image_white_36dp)
+                  .into(holder.moviePoster);
         }
 
         @Override
@@ -272,4 +294,26 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
     }
 
+    class FavoritesQueryHandler extends AsyncQueryHandler {
+
+        public FavoritesQueryHandler(ContentResolver cr) {
+            super(cr);
+        }
+
+        @Override
+        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            List<Movie> favorites = new ArrayList<Movie>();
+
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    Movie movie = Movie.createFromCursor(cursor);
+                    favorites.add(movie);
+                }
+                cursor.close();
+            }
+
+            mAdapter.setData(favorites);
+        }
+
+    }
 }
