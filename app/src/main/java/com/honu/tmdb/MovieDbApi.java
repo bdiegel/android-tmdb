@@ -15,6 +15,7 @@ import com.honu.tmdb.rest.VideoResponse;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 
@@ -160,6 +161,7 @@ public class MovieDbApi {
             RestAdapter.Builder builder = new RestAdapter.Builder()
                   .setEndpoint(ENDPOINT)
                   .setConverter(new GsonConverter(gson))
+                  .setClient(new OkClient())
                   .setLogLevel(RestAdapter.LogLevel.BASIC);
                   //.setLogLevel(RestAdapter.LogLevel.FULL);
 
