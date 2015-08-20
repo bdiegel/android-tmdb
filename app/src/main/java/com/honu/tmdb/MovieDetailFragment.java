@@ -4,11 +4,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -42,6 +47,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
     MovieDbApi mApi;
 
     MovieDetailsAdapter mAdapter;
+
+    ShareActionProvider mShareActionProvider;
+
+    MenuItem mShareMenuItem;
 
     @Bind(R.id.recycler)
     RecyclerView mRecyclerView;
@@ -83,7 +92,19 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
             mApi.requestMovieVideos(mMovie.getId(), this);
         }
 
+        // show options menu
+        setHasOptionsMenu(true);
+
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d(TAG, "onCreateOptionsMenu");
+        getActivity().getMenuInflater().inflate(R.menu.menu_movie_detail_frag, menu);
+        mShareMenuItem = menu.findItem(R.id.menu_item_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(mShareMenuItem);
+        setupShareIntent();
     }
 
     @Override
@@ -98,11 +119,30 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         List<Video> trailers = response.getYoutubeTrailers();
         Log.d(TAG, "Number of YouTube trailers: " + trailers.size());
         mAdapter.setTrailers(trailers);
+        setupShareIntent();
     }
 
     @Override
     public void error(ApiError error) {
         Log.e(TAG, "Error retrieving data from API: " + error.getReason());
+    }
+
+    private void setupShareIntent() {
+        if (mShareActionProvider == null)
+            return;
+
+        Uri url = mAdapter.getFirstTrailerUri();
+        if (url != null) {
+            Intent shareIntent = new Intent();
+            shareIntent.setType("text/plain");
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Check out this trailer for " + mMovie.getTitle());
+            shareIntent.putExtra(Intent.EXTRA_TEXT, url.toString());
+            mShareActionProvider.setShareIntent(shareIntent);
+            mShareMenuItem.setVisible(true);
+        } else {
+            mShareMenuItem.setVisible(false);
+        }
     }
 
     /**
@@ -132,6 +172,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
             this.trailers.clear();
             this.trailers.addAll(trailers);
             this.notifyDataSetChanged();
+        }
+
+        public Uri getFirstTrailerUri() {
+            return !trailers.isEmpty() ? trailers.get(0).getYoutubUrl() : null;
         }
 
         @Override
@@ -247,8 +291,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
             @OnClick({R.id.view_play_button, R.id.video_name})
             public void playTrailer(View v) {
-                Video video = trailers.get(getAdapterPosition() - 1);
-                Uri url = Uri.parse("http://www.youtube.com/watch?v=" + video.getKey());
+                Uri url = trailers.get(getAdapterPosition() - 1).getYoutubUrl();
                 Log.d(TAG, "Play url: " + url);
                 startActivity(new Intent(Intent.ACTION_VIEW, url));
             }
