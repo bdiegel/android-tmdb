@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
 
     @Override
     public void onMovieSelected(Movie movie, boolean onClick) {
-        Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
+        //Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
 
         mSelectedMovie = movie;
         mIsFavorite = MovieFavorites.isFavoriteMovie(this, mSelectedMovie.getId());
@@ -149,6 +148,6 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     private void toggleFavorite() {
         mIsFavorite = !mIsFavorite;
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
-        MovieFavorites.updateFavorite(this, mIsFavorite, mSelectedMovie.getId());
+        MovieFavorites.updateFavorite(this, mIsFavorite, mSelectedMovie);
     }
 }

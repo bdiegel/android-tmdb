@@ -113,6 +113,6 @@ public class MovieDetailActivity extends AppCompatActivity  {
     private void toggleFavorite() {
         mIsFavorite = !mIsFavorite;
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
-        MovieFavorites.updateFavorite(this, mIsFavorite, mMovie.getId());
+        MovieFavorites.updateFavorite(this, mIsFavorite, mMovie);
     }
 }

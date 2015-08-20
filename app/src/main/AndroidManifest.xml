@@ -3,6 +3,7 @@
     package="com.honu.tmdb" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -28,9 +29,17 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:theme="@style/SettingsTheme"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings"
+            android:theme="@style/SettingsTheme" >
         </activity>
+
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="com.honu.tmdb"
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="false">
+        </provider>
     </application>
 
 </manifest>
