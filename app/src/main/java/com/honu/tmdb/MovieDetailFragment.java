@@ -1,6 +1,9 @@
 package com.honu.tmdb;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.honu.tmdb.data.MovieContract;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.Review;
@@ -90,6 +94,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
             mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
             mApi.requestMovieReviews(mMovie.getId(), this);
             mApi.requestMovieVideos(mMovie.getId(), this);
+            queryGenres();
         }
 
         // show options menu
@@ -145,6 +150,22 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         }
     }
 
+    // query local database for genre ids in offline mode
+    private void queryGenres() {
+
+        if (mMovie.getGenreIds().length == 0 && MovieFavorites.isFavoriteMovie(getActivity(), mMovie.getId())) {
+
+            GenresQueryHandler handler = new GenresQueryHandler(getActivity().getContentResolver());
+
+            handler.startQuery(5, null, MovieContract.MovieGenreEntry.CONTENT_URI,
+                  new String[]{"*"},
+                  MovieContract.MovieGenreEntry.WHERE_MOVIE_ID,
+                  new String[]{""+mMovie.getId()},
+                  null
+            );
+        }
+    }
+
     /**
      * Adapter for recycler view has 3 view types to display movie information. The first item is
      * always the header. It is followed by any trailers then any reviews.
@@ -171,6 +192,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         public void setTrailers(List<Video> trailers) {
             this.trailers.clear();
             this.trailers.addAll(trailers);
+            this.notifyDataSetChanged();
+        }
+
+        public void updateGenres() {
             this.notifyDataSetChanged();
         }
 
@@ -318,5 +343,30 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(review.getUrl())));
             }
         }
+    }
+
+    class GenresQueryHandler extends AsyncQueryHandler {
+
+        public GenresQueryHandler(ContentResolver cr) {
+            super(cr);
+        }
+
+        @Override
+        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            Log.d(TAG, "Genres query returned cursor: " + cursor.getCount());
+            int[] genreIds = new int[cursor.getCount()];
+
+            int i = 0;
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieGenreEntry.COLUMN_GENRE_ID));
+                    genreIds[i++] = id;
+                }
+                cursor.close();
+                mMovie.setGenreIds(genreIds);
+                mAdapter.updateGenres();
+            }
+        }
+
     }
 }

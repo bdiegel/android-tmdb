@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * Caches ids of favorite movies and persists them to SharedPreferences
  *
+ * Movie details are persisted to SQLite by MovieProvider.
  */
 public final class MovieFavorites {
 
@@ -112,6 +113,35 @@ public final class MovieFavorites {
 
         final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
         handler.startInsert(2, null, MovieContract.MovieEntry.CONTENT_URI, values);
+
+        // update genres
+        insertGenres(context, movie.getId(), movie.getGenreIds());
+    }
+
+    protected static void insertGenres(final Context context, int movieId, int[] genreIds) {
+
+        final ContentValues[] allValues = new ContentValues[genreIds.length];
+        for (int i=0; i<genreIds.length; i++) {
+            ContentValues  values = new ContentValues();
+            values.put(MovieContract.MovieGenreEntry.COLUMN_MOVIE_ID, movieId);
+            values.put(MovieContract.MovieGenreEntry.COLUMN_GENRE_ID, genreIds[i]);
+            allValues[i] = values;
+        }
+
+        // wtf: no bulkInsert for AsyncQueryHandler
+        new Thread(new Runnable() {
+            public void run() {
+                context.getContentResolver().bulkInsert(MovieContract.MovieGenreEntry.CONTENT_URI, allValues);
+            }
+        }).start();
+    }
+
+    protected static void deleteGenres(Context context, int movidId) {
+        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
+        handler.startDelete(3, null,
+              MovieContract.MovieGenreEntry.CONTENT_URI,
+              MovieContract.MovieGenreEntry.WHERE_MOVIE_ID,
+              new String[] {""+movidId});
     }
 
     public static void removeFavorite(Context context, Movie movie) {

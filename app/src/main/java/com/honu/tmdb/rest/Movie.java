@@ -108,6 +108,10 @@ public class Movie implements Parcelable {
         return genreIds;
     }
 
+    public void setGenreIds(int[] genreIds) {
+        this.genreIds = genreIds;
+    }
+
     public List<String> getMovieGenres() {
         List<String> genres = new ArrayList<>();
         for (int i=0; i<genreIds.length; i++) {
