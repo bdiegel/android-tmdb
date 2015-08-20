@@ -23,6 +23,8 @@ public class MovieContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
         public static final String SELECT_FAVORITES = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_FAVORITE + " = 1 ";
+        public static final String WHERE_MOVIE_ID = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
