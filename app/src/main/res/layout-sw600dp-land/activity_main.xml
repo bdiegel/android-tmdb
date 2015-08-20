@@ -41,6 +41,8 @@
                 android:background="@color/primary_light"
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 tools:text="Movie Title"
                 />
