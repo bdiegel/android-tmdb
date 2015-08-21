@@ -7,4 +7,7 @@
     <string name="title_activity_movie_detail">MovieDetailActivity</string>
     <string name="key_sort_method_pref">sort.method.pref</string>
     <string name="key_sort_method_current">sort.method.current</string>
+    <string name="message_no_trailer">"No trailer to share for "</string>
+    <string name="title_share_action">Share trailer</string>
+    <string name="share_action_subject_prefix">"Check out this trailer for "</string>
 </resources>

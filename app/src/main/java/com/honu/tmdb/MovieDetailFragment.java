@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
@@ -22,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.honu.tmdb.data.MovieContract;
 import com.honu.tmdb.rest.ApiError;
@@ -108,8 +108,13 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         Log.d(TAG, "onCreateOptionsMenu");
         getActivity().getMenuInflater().inflate(R.menu.menu_movie_detail_frag, menu);
         mShareMenuItem = menu.findItem(R.id.menu_item_share);
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(mShareMenuItem);
-        setupShareIntent();
+        mShareMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                shareVideoUrl();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -124,7 +129,6 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         List<Video> trailers = response.getYoutubeTrailers();
         Log.d(TAG, "Number of YouTube trailers: " + trailers.size());
         mAdapter.setTrailers(trailers);
-        setupShareIntent();
     }
 
     @Override
@@ -132,21 +136,18 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         Log.e(TAG, "Error retrieving data from API: " + error.getReason());
     }
 
-    private void setupShareIntent() {
-        if (mShareActionProvider == null)
-            return;
+    private void shareVideoUrl() {
 
         Uri url = mAdapter.getFirstTrailerUri();
         if (url != null) {
             Intent shareIntent = new Intent();
             shareIntent.setType("text/plain");
             shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Check out this trailer for " + mMovie.getTitle());
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.share_action_subject_prefix) + mMovie.getTitle());
             shareIntent.putExtra(Intent.EXTRA_TEXT, url.toString());
-            mShareActionProvider.setShareIntent(shareIntent);
-            mShareMenuItem.setVisible(true);
+            startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.title_share_action)));
         } else {
-            mShareMenuItem.setVisible(false);
+            Toast.makeText(getActivity(), getResources().getString(R.string.message_no_trailer) + mMovie.getTitle(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -233,7 +234,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                 case HEADER_VIEW_TYPE:
                     MovieHeaderViewHolder headerViewHolder = (MovieHeaderViewHolder) holder;
                     int screenWidth = getResources().getDisplayMetrics().widthPixels;
-                    Picasso.with(headerViewHolder.posterView.getContext()).load(mMovie.getPosterUrl(screenWidth)).into(headerViewHolder.posterView);
+                    Picasso.with(headerViewHolder.posterView.getContext())
+                          .load(mMovie.getPosterUrl(screenWidth))
+                          .placeholder(R.drawable.ic_image_white_36dp)
+                          .into(headerViewHolder.posterView);
                     headerViewHolder.ratingView.setText("" + mMovie.getVoteAverage());
                     headerViewHolder.releaseView.setText(mMovie.getReleaseDate());
                     headerViewHolder.synopsisView.setText(mMovie.getOverview());
@@ -261,7 +265,6 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         @Override
         public int getItemViewType(int position) {
             int viewType;
-
 
             if (mMovie == null)
                 return -1;
