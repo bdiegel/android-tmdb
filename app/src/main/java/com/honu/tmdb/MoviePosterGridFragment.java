@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.honu.tmdb.data.MovieContract;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
+import com.honu.tmdb.rest.MovieListResponse;
 import com.honu.tmdb.rest.MovieResponse;
 import com.squareup.picasso.Picasso;
 
@@ -40,7 +41,7 @@ import butterknife.OnClick;
 /**
  * Fragment displays grid of movie posters using recycler view
  */
-public class MoviePosterGridFragment extends Fragment implements MovieDbApi.MovieListener {
+public class MoviePosterGridFragment extends Fragment implements MovieDbApi.MovieListListener, MovieDbApi.MovieListener {
 
     static final String TAG = MoviePosterGridFragment.class.getSimpleName();
 
@@ -168,8 +169,13 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
 
     @Override
-    public void success(MovieResponse response) {
+    public void success(MovieListResponse response) {
         mAdapter.setData(response.getMovies());
+    }
+
+    @Override
+    public void success(MovieResponse response) {
+        mAdapter.appendData(response.getMovie());
     }
 
     @Override
@@ -203,15 +209,25 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     }
 
     private void queryFavorites() {
-        Log.d(TAG, "Query favorites");
-        FavoritesQueryHandler handler = new FavoritesQueryHandler(getActivity().getContentResolver());
 
-        handler.startQuery(1, null, MovieContract.MovieEntry.CONTENT_URI,
-              new String[]{"*"},
-              MovieContract.MovieEntry.SELECT_FAVORITES,
-              null,
-              null
-        );
+        if (isNetworkAvailable()) {
+            Log.d(TAG, "Query favorites (online mode)");
+            mAdapter.clearData();
+            List<Integer> favoriteIds = MovieFavorites.getFavoriteMovies(getActivity());
+            for (int favoriteId : favoriteIds) {
+                mApi.requestMovie(favoriteId, this);
+            }
+        } else {
+            Log.d(TAG, "Query favorites (offline mode)");
+            FavoritesQueryHandler handler = new FavoritesQueryHandler(getActivity().getContentResolver());
+
+            handler.startQuery(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                  new String[]{"*"},
+                  MovieContract.MovieEntry.SELECT_FAVORITES,
+                  null,
+                  null
+            );
+        }
     }
 
     private boolean checkNetwork() {
@@ -237,6 +253,16 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             this.data.addAll(data);
             this.notifyDataSetChanged();
             notifyMovieSelectionListener();
+        }
+
+        public void appendData(Movie movie) {
+            this.data.add(movie);
+            this.notifyItemChanged(this.data.size() - 1);
+        }
+
+        public void clearData() {
+            this.data.clear();
+            this.notifyDataSetChanged();
         }
 
         public void notifyMovieSelectionListener() {

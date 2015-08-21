@@ -26,7 +26,7 @@ public class Movie implements Parcelable {
     String backdropPath;
 
     @SerializedName("genre_ids")
-    int[] genreIds;
+    int[] genreIds = new int[0];
 
     @SerializedName("original_language")
     String originalLanguage;
@@ -114,8 +114,9 @@ public class Movie implements Parcelable {
 
     public List<String> getMovieGenres() {
         List<String> genres = new ArrayList<>();
-        for (int i=0; i<genreIds.length; i++) {
-            MovieGenre genre = MovieGenre.getById(genreIds[i]);
+        int[] ids = getGenreIds();
+        for (int i=0; i<ids.length; i++) {
+            MovieGenre genre = MovieGenre.getById(ids[i]);
             if (genre != null) {
                 genres.add(genre.getTitle());
             }

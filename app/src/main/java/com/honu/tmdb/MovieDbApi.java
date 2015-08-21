@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.honu.tmdb.rest.ApiError;
+import com.honu.tmdb.rest.MovieListResponse;
 import com.honu.tmdb.rest.MovieResponse;
 import com.honu.tmdb.rest.MovieService;
 import com.honu.tmdb.rest.ReviewResponse;
@@ -46,6 +47,11 @@ public class MovieDbApi {
         public void error(ApiError error);
     }
 
+    public interface MovieListListener {
+        public void success(MovieListResponse response);
+        public void error(ApiError error);
+    }
+
 
     public interface VideoListener {
         public void success(VideoResponse response);
@@ -69,11 +75,11 @@ public class MovieDbApi {
     }
 
 
-    public void requestMostPopularMovies(@Nullable final MovieListener listener) {
+    public void requestMostPopularMovies(@Nullable final MovieListListener listener) {
 
-        getMovieService().fetchPopularMovies(sApiKey, new Callback<MovieResponse>() {
+        getMovieService().fetchPopularMovies(sApiKey, new Callback<MovieListResponse>() {
             @Override
-            public void success(MovieResponse response, Response httpResponse) {
+            public void success(MovieListResponse response, Response httpResponse) {
                 Log.d(TAG, "Number of movies found: " + response.getMovies().size());
                 if (listener != null) {
                     listener.success(response);
@@ -90,11 +96,11 @@ public class MovieDbApi {
         });
     }
 
-    public void requestHighestRatedMovies(@Nullable final MovieListener listener) {
+    public void requestHighestRatedMovies(@Nullable final MovieListListener listener) {
 
-        getMovieService().fetchHighestRatedMovies(sApiKey, new Callback<MovieResponse>() {
+        getMovieService().fetchHighestRatedMovies(sApiKey, new Callback<MovieListResponse>() {
             @Override
-            public void success(MovieResponse response, Response httpResponse) {
+            public void success(MovieListResponse response, Response httpResponse) {
                 Log.d(TAG, "Number of movies found: " + response.getMovies().size());
                 if (listener != null) {
                     listener.success(response);
@@ -138,6 +144,27 @@ public class MovieDbApi {
             @Override
             public void success(VideoResponse response, Response httpResponse) {
                 Log.d(TAG, "Total number of videos found: " + response.getVideos().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
+    public void requestMovie(@NonNull int movieId, @Nullable final MovieListener listener) {
+
+        getMovieService().fetchMovie(movieId, sApiKey, new Callback<MovieResponse>() {
+            @Override
+            public void success(MovieResponse response, Response httpResponse) {
+                Log.d(TAG, "Movie found: " + response.getMovie().getTitle());
                 if (listener != null) {
                     listener.success(response);
                 }
