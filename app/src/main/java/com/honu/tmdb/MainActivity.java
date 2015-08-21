@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings: {
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -94,17 +93,18 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     protected void onPause() {
         super.onPause();
 
-        if (getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT) != null) {
-            MovieDetailFragment fragment = (MovieDetailFragment)
-                  getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.remove(fragment).commit();
-        }
+//        if (getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT) != null) {
+//            MovieDetailFragment fragment = (MovieDetailFragment)
+//                  getSupportFragmentManager().findFragmentByTag(TAG_DETAIL_FRAGMENT);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.remove(fragment).commit();
+//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         if (mSelectedMovie != null && findViewById(R.id.movie_detail_title) != null) {
             onMovieSelected(mSelectedMovie, false);
         }

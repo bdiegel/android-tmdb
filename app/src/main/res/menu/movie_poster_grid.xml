@@ -9,6 +9,7 @@
         android:icon="@drawable/ic_trending_up_white_24dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:title="test"
+        android:orderInCategory="10"
         app:showAsAction="always"/>
 
 </menu>
