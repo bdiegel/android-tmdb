@@ -244,8 +244,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             }
         } else {
             Log.d(TAG, "Query favorites (offline mode)");
+            mAdapter.clearData();
             FavoritesQueryHandler handler = new FavoritesQueryHandler(getActivity().getContentResolver());
-
             handler.startQuery(1, null, MovieContract.MovieEntry.CONTENT_URI,
                   new String[]{"*"},
                   MovieContract.MovieEntry.SELECT_FAVORITES,
