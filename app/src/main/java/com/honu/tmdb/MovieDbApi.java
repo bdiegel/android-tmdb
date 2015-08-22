@@ -96,9 +96,51 @@ public class MovieDbApi {
         });
     }
 
+    public void requestMostPopularMovies(int page, @Nullable final MovieListListener listener) {
+
+        getMovieService().fetchPopularMovies(sApiKey, page, new Callback<MovieListResponse>() {
+            @Override
+            public void success(MovieListResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of movies found: " + response.getMovies().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
     public void requestHighestRatedMovies(@Nullable final MovieListListener listener) {
 
         getMovieService().fetchHighestRatedMovies(sApiKey, new Callback<MovieListResponse>() {
+            @Override
+            public void success(MovieListResponse response, Response httpResponse) {
+                Log.d(TAG, "Number of movies found: " + response.getMovies().size());
+                if (listener != null) {
+                    listener.success(response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e(TAG, "Api error: " + error.getMessage());
+                if (listener != null) {
+                    listener.error(new ApiError(error));
+                }
+            }
+        });
+    }
+
+    public void requestHighestRatedMovies(int page, @Nullable final MovieListListener listener) {
+
+        getMovieService().fetchHighestRatedMovies(sApiKey, page, new Callback<MovieListResponse>() {
             @Override
             public void success(MovieListResponse response, Response httpResponse) {
                 Log.d(TAG, "Number of movies found: " + response.getMovies().size());

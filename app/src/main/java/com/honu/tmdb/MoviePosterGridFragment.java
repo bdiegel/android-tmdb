@@ -54,8 +54,15 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     MovieDbApi mApi;
     MovieGridRecyclerAdapter mAdapter;
+    RecyclerScrollListener mScrollListener;
 
     int mSortMethod = SortOption.POPULARITY;
+
+    // number of pages available for scrolling
+    int mPageMax = 25;
+
+    // number of items per page
+    int mPageSize = 20;
 
     // communicates selection events back to listener
     OnMovieSelectedListener mListener;
@@ -82,9 +89,11 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
 
         mAdapter = new MovieGridRecyclerAdapter();
+        mScrollListener = new RecyclerScrollListener();
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setData(movies);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 3));
+        mRecyclerView.addOnScrollListener(mScrollListener);
 
         // initialize api
         mApi = MovieDbApi.getInstance(getString(R.string.tmdb_api_key));
@@ -147,7 +156,6 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "Options menu item selected: " + item.getItemId());
         return true;
     }
 
@@ -170,7 +178,16 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     @Override
     public void success(MovieListResponse response) {
-        mAdapter.setData(response.getMovies());
+
+        if (response.getPage() == 1) {
+            // initialize with results for first page
+            int pageMax = (response.getTotalPages() < mPageMax) ? response.getTotalPages() : mPageMax;
+            mScrollListener.totalPages = pageMax;
+            mAdapter.setData(response.getMovies(), mPageSize, pageMax);
+        } else {
+            // append results for subsequent pages
+            mAdapter.appendData(response.getMovies());
+        }
     }
 
     @Override
@@ -191,6 +208,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             return;
 
         mSortMethod = sortType;
+        mScrollListener.init();
+        mRecyclerView.scrollToPosition(0);
 
         switch (sortType) {
             case SortOption.POPULARITY:
@@ -230,6 +249,22 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
     }
 
+    private void loadNextPage(int page) {
+        //Log.d(TAG, "Load page: " + page);
+
+        switch (mSortMethod) {
+            case SortOption.POPULARITY:
+                mApi.requestMostPopularMovies(page, this);
+                return;
+            case SortOption.RATING:
+                mApi.requestHighestRatedMovies(page, this);
+                return;
+            default:
+                return;
+        }
+
+    }
+
     private boolean checkNetwork() {
         if (!isNetworkAvailable()) {
             Toast.makeText(getActivity(), "Network unavailable (check your connection)", Toast.LENGTH_LONG).show();
@@ -248,11 +283,32 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         ArrayList<Movie> data = new ArrayList<>();
 
+        int maxPages = -1;
+        int pageSize = 20;
+
+        public void setData(List<Movie> data, int pageSize, int maxPages) {
+            this.maxPages = maxPages;
+            this.pageSize = pageSize;
+            setData(data);
+        }
+
         public void setData(List<Movie> data) {
             this.data.clear();
             this.data.addAll(data);
             this.notifyDataSetChanged();
             notifyMovieSelectionListener();
+        }
+
+//        // ran into bug that forced switching from notifyItemRangeInserted to notifyDataSetChanged
+//        public void appendData(List<Movie> movies) {
+//            int previousSize = this.data.size();
+//            this.data.addAll(movies);
+//            this.notifyItemRangeInserted(previousSize, previousSize + movies.size());
+//        }
+
+        public void appendData(List<Movie> movies) {
+            this.data.addAll(movies);
+            this.notifyDataSetChanged();
         }
 
         public void appendData(Movie movie) {
@@ -261,6 +317,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
 
         public void clearData() {
+            this.maxPages = -1;
             this.data.clear();
             this.notifyDataSetChanged();
         }
@@ -280,6 +337,15 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         @Override
         public void onBindViewHolder(MovieGridItemViewHolder holder, int position) {
+
+            // pending results
+            if (position >= data.size()) {
+                holder.movieTitle.setText("");
+                holder.moviePoster.setImageResource(R.drawable.ic_image_white_36dp);
+                return;
+            }
+
+            // display movie details
             Movie movie = data.get(position);
             holder.movieTitle.setText(movie.getTitle());
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
@@ -293,7 +359,13 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         @Override
         public int getItemCount() {
-            return data.size();
+            // returns the expected size when paging is enabled; this prevents an 'invalid view holder position'
+            // exception thrown by validateViewHolderForOffsetPosition
+            if (maxPages == -1) {
+                return  data.size();
+            } else {
+                return maxPages * pageSize;
+            }
         }
 
         class MovieGridItemViewHolder extends RecyclerView.ViewHolder {
@@ -315,6 +387,58 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
                 Movie movie = data.get(adapterPosition);
                 if (mListener != null) {
                     mListener.onMovieSelected(movie, true);
+                }
+            }
+        }
+    }
+
+    class RecyclerScrollListener extends RecyclerView.OnScrollListener {
+        int currentPage;
+        int totalPages;
+        int previousTotal;
+        int visibleThreshold;
+        boolean loading;
+
+        public void init() {
+            currentPage = 1;
+            totalPages = 1;
+            previousTotal = 0;
+            visibleThreshold = 5;
+            loading = false;
+        }
+
+        public RecyclerScrollListener() {
+            super();
+            init();
+        }
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+            int visibleItemCount = recyclerView.getChildCount();
+            //int totalItemCount = gridLayoutManager.getItemCount();
+            int totalItemCount = mAdapter.data.size();
+            int firstVisibleItem = gridLayoutManager.findFirstVisibleItemPosition();
+
+            // load finished
+            if (loading && totalItemCount > previousTotal) {
+                loading = false;
+                previousTotal = totalItemCount;
+                currentPage++;
+            }
+
+            // load more data when near end of scroll view (within threshold)
+            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+                if (currentPage < totalPages) {
+                    loadNextPage(currentPage + 1);
+                    loading = true;
                 }
             }
         }

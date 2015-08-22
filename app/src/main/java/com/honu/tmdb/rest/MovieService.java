@@ -20,9 +20,17 @@ public interface MovieService {
     @GET("/discover/movie?sort_by=popularity.desc")
     void fetchPopularMovies(@Query("api_key") String apiKey, Callback<MovieListResponse> cb);
 
+    // Next page of 20 sorted by popularity
+    @GET("/discover/movie?sort_by=popularity.desc")
+    void fetchPopularMovies(@Query("api_key") String apiKey, @Query("page") int page, Callback<MovieListResponse> cb);
+
     // Top 20 sorted by rating
     @GET("/discover/movie?sort_by=vote_average.desc")
     void fetchHighestRatedMovies(@Query("api_key") String apiKey, Callback<MovieListResponse> cb);
+
+    // Next page of 20 sorted by rating
+    @GET("/discover/movie?sort_by=vote_average.desc")
+    void fetchHighestRatedMovies(@Query("api_key") String apiKey, @Query("page") int page, Callback<MovieListResponse> cb);
 
     // Get movie details by id
     @GET("/movie/{id}")
