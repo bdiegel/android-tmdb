@@ -5,35 +5,39 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
+ * Simple wrapper for the response to a request for a single movie.
  *
+ * There are differences between the JSON returned for movies from the /movie/{id} and /discover endpoints.
+ * In particular, the format for genre differs:
+ *
+ *  - the discover endpoint has an array of genre_ids.
+ *  - the movie queried by id returns an array of objects with an id and name.
  */
-public class MovieResponse {
+public class MovieResponse extends Movie {
 
-    @SerializedName("page")
-    int page;
+    @SerializedName("genres")
+    List<Genre> genres;
 
-    @SerializedName("results")
-    List<Movie> movies;
-
-    @SerializedName("total_pages")
-    int totalPages;
-
-    @SerializedName("total_results")
-    int totalResults;
-
-    public int getPage() {
-        return page;
+    @Override
+    public int[] getGenreIds() {
+        int[] ids = new int[genres.size()];
+        for (int i=0; i<genres.size(); i++) {
+            ids[i] = genres.get(i).id;
+        }
+        return ids;
     }
 
-    public List<Movie> getMovies() {
-        return movies;
+    /**
+     * Extracts the movie from the response (discarding this wrapper type).
+     * Sets any fields on the base type (ie, genre_ids).
+     */
+    public Movie getMovie() {
+        this.setGenreIds(getGenreIds());
+        return this;
     }
 
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public int getTotalResults() {
-        return totalResults;
+    static class Genre {
+        int id;
+        String name;
     }
 }
