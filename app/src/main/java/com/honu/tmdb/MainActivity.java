@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             String title = movie == null ? "" : movie.getTitle();
             TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
             titleView.setText(title);
+            mFavoriteFab.show();
 
         } else if (onClick) {
             Intent intent = new Intent(this, MovieDetailActivity.class);
