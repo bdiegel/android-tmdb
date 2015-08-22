@@ -236,7 +236,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                     int screenWidth = getResources().getDisplayMetrics().widthPixels;
                     Picasso.with(headerViewHolder.posterView.getContext())
                           .load(mMovie.getPosterUrl(screenWidth))
-                          .placeholder(R.drawable.ic_image_white_36dp)
+                          .placeholder(R.drawable.ic_local_movies_white_36dp)
                           .into(headerViewHolder.posterView);
                     headerViewHolder.ratingView.setText("" + mMovie.getVoteAverage());
                     headerViewHolder.releaseView.setText(mMovie.getReleaseDate());

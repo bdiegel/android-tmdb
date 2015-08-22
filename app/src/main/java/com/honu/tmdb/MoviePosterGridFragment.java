@@ -352,8 +352,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             //Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
             Picasso.with(holder.moviePoster.getContext())
                   .load(movie.getPosterUrl(screenWidth))
-                  .placeholder(R.drawable.ic_image_white_36dp)
-                  .error(R.drawable.ic_image_white_36dp)
+                  .placeholder(R.drawable.ic_local_movies_white_36dp)
+                  .error(R.drawable.ic_local_movies_white_36dp)
                   .into(holder.moviePoster);
         }
 
@@ -384,9 +384,11 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             @OnClick(R.id.movie_poster)
             public void onClick() {
                 int adapterPosition = this.getAdapterPosition();
-                Movie movie = data.get(adapterPosition);
-                if (mListener != null) {
-                    mListener.onMovieSelected(movie, true);
+                if (adapterPosition < data.size()) {
+                    Movie movie = data.get(adapterPosition);
+                    if (mListener != null) {
+                        mListener.onMovieSelected(movie, true);
+                    }
                 }
             }
         }
