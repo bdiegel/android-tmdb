@@ -211,7 +211,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         mScrollListener.init();
         mRecyclerView.scrollToPosition(0);
 
-        switch (sortType) {
+        switch (mSortMethod) {
             case SortOption.POPULARITY:
                 mApi.requestMostPopularMovies(this);
                 return;
@@ -227,7 +227,13 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
     }
 
+    public void removeMovie(Movie movie) {
+        mAdapter.removeData(movie);
+    }
+
     private void queryFavorites() {
+
+        mListener.onMovieSelected(null, false);
 
         if (isNetworkAvailable()) {
             Log.d(TAG, "Query favorites (online mode)");
@@ -314,6 +320,18 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         public void appendData(Movie movie) {
             this.data.add(movie);
             this.notifyItemChanged(this.data.size() - 1);
+            if (this.data.size() == 1) {
+                notifyMovieSelectionListener();
+            }
+        }
+
+        public void removeData(Movie movie) {
+            int index = this.data.indexOf(movie);
+            if (index != -1)
+                this.data.remove(index);
+
+            this.notifyItemRemoved(index);
+            notifyMovieSelectionListener();
         }
 
         public void clearData() {

@@ -115,13 +115,16 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
         //Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
 
         mSelectedMovie = movie;
-        mIsFavorite = MovieFavorites.isFavoriteMovie(this, mSelectedMovie.getId());
+        mIsFavorite = mSelectedMovie == null ? false : MovieFavorites.isFavoriteMovie(this, mSelectedMovie.getId());
 
         if (mTwoPaneMode) {
             MovieDetailFragment fragment = (MovieDetailFragment)
                   getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
 
-            if (fragment == null || fragment.mMovie.getId() != mSelectedMovie.getId()) {
+            if (fragment != null & movie == null) {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.remove(fragment).commit();
+            } else if (fragment == null || fragment.mMovie.getId() != mSelectedMovie.getId()) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MovieDetailFragment.KEY_MOVIE, movie);
                 fragment = MovieDetailFragment.newInstance(movie);
@@ -131,8 +134,9 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
                 mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
             }
 
+            String title = movie == null ? "" : movie.getTitle();
             TextView titleView = (TextView) findViewById(R.id.movie_detail_title);
-            titleView.setText(movie.getTitle());
+            titleView.setText(title);
 
         } else if (onClick) {
             Intent intent = new Intent(this, MovieDetailActivity.class);
@@ -148,6 +152,13 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     private void toggleFavorite() {
         mIsFavorite = !mIsFavorite;
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
-        MovieFavorites.updateFavorite(this, mIsFavorite, mSelectedMovie);
+        if (mSelectedMovie != null) {
+            MovieFavorites.updateFavorite(this, mIsFavorite, mSelectedMovie);
+        }
+        // refresh after movie unfavorited
+        if (mTwoPaneMode && !mIsFavorite) {
+            MoviePosterGridFragment gridFragment = (MoviePosterGridFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_grid);
+            gridFragment.removeMovie(mSelectedMovie);
+        }
     }
 }
