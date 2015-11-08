@@ -69,7 +69,8 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     // interface to communicate movie selection events to MainActivity
     public interface OnMovieSelectedListener {
-        public void onMovieSelected(Movie selection, boolean onClick);
+        //public void onMovieSelected(Movie selection, boolean onClick);
+        public void onMovieSelected(Movie selection, boolean onClick, View view);
     }
 
     @Override
@@ -233,7 +234,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     private void queryFavorites() {
 
-        mListener.onMovieSelected(null, false);
+        mListener.onMovieSelected(null, false, null);
 
         if (isNetworkAvailable()) {
             Log.d(TAG, "Query favorites (online mode)");
@@ -342,7 +343,15 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         public void notifyMovieSelectionListener() {
             if (mListener != null && !data.isEmpty()) {
-                mListener.onMovieSelected(data.get(0), false);
+                View view = mRecyclerView.getChildAt(0);
+                Log.d(TAG, "Found child view: " + view);
+                View posterView = null;
+                if (view != null) {
+                    posterView = view.findViewById(R.id.movie_poster);
+                    Log.d(TAG, "Found poster view: " + posterView);
+                }
+               mListener.onMovieSelected(data.get(0), false, posterView);
+                //mRecyclerView.setSelected();
             }
         }
 
@@ -405,7 +414,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
                 if (adapterPosition < data.size()) {
                     Movie movie = data.get(adapterPosition);
                     if (mListener != null) {
-                        mListener.onMovieSelected(movie, true);
+                        mListener.onMovieSelected(movie, true, moviePoster);
                     }
                 }
             }

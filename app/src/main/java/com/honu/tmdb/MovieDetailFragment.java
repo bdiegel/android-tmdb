@@ -1,16 +1,19 @@
 package com.honu.tmdb;
 
+import android.annotation.TargetApi;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -97,10 +100,18 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
             queryGenres();
         }
 
+        setupTransition();
+
         // show options menu
         setHasOptionsMenu(true);
 
         return view;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setupTransition() {
+        //setEnterTransition(new Explode());
+        setSharedElementEnterTransition(new Slide());
     }
 
     @Override
