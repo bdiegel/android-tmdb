@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.honu.tmdb.rest.Movie;
@@ -106,12 +110,12 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
         super.onResume();
 
         if (mSelectedMovie != null && findViewById(R.id.movie_detail_title) != null) {
-            onMovieSelected(mSelectedMovie, false);
+            onMovieSelected(mSelectedMovie, false, null);
         }
     }
 
     @Override
-    public void onMovieSelected(Movie movie, boolean onClick) {
+    public void onMovieSelected(Movie movie, boolean onClick, View srcView) {
         //Log.d(TAG, "Show movie details: " + movie.getTitle() + " mTwoPaneMode=" + mTwoPaneMode + " id=" + movie.getId());
 
         mSelectedMovie = movie;
@@ -130,6 +134,10 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
                 fragment = MovieDetailFragment.newInstance(movie);
                 fragment.setArguments(bundle);
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (srcView != null) {
+                    Log.d(TAG, "Fragment with transition??");
+                    transaction.addSharedElement(srcView, getResources().getString(R.string.transition_poster));
+                }
                 transaction.replace(R.id.fragment_detail, fragment, TAG_DETAIL_FRAGMENT).commit();
                 mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
             }
@@ -140,10 +148,22 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
             mFavoriteFab.show();
 
         } else if (onClick) {
-            Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtra(MovieDetailActivity.KEY_MOVIE, movie);
-            this.startActivity(intent);
+            onMovieClicked(movie, true, srcView);
+//            Intent intent = new Intent(this, MovieDetailActivity.class);
+//            intent.putExtra(MovieDetailActivity.KEY_MOVIE, movie);
+//            this.startActivity(intent);
         }
+    }
+
+    public void onMovieClicked(Movie movie, boolean onClick, View srcView) {
+        Log.d(TAG, "Start Activity with transition??");
+        Intent intent = new Intent(this, MovieDetailActivity.class);
+        intent.putExtra(MovieDetailActivity.KEY_MOVIE, movie);
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+              makeSceneTransitionAnimation(this, srcView, getResources().getString(R.string.transition_poster));
+        ActivityCompat.startActivity(this, intent, options.toBundle());
+        //this.startActivity(intent, options);
     }
 
     @Nullable @OnClick(R.id.fab_favorite) void onFavoriteClicked() {

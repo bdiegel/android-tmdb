@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -72,6 +73,13 @@ public class MovieDetailActivity extends AppCompatActivity  {
 
         // set image if favorite
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
+
+        setupTransition();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setupTransition() {
+        getWindow().setEnterTransition(new Explode());
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

@@ -10,4 +10,5 @@
     <string name="message_no_trailer">"No trailer to share for "</string>
     <string name="title_share_action">Share trailer</string>
     <string name="share_action_subject_prefix">"Check out this trailer for "</string>
+    <string name="transition_poster">transition_movie_poster</string>
 </resources>
