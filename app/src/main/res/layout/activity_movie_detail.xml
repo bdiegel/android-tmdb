@@ -29,7 +29,7 @@
             <ImageView
                 android:id="@+id/movie_detail_backdrop"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:minHeight="300dp"
                 android:scaleType="centerCrop"
@@ -55,13 +55,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_favorite"
-        style="@style/FabStyle"
-        android:clickable="true"
-        app:fabSize="normal"
-        app:layout_anchor="@+id/app_bar_layout"
-        app:layout_anchorGravity="bottom|right|end"/>
+
 
     <!--<android.support.v7.widget.RecyclerView-->
         <!--android:id="@+id/recycler"-->
@@ -71,15 +65,24 @@
         <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
         <!-->-->
     <!--</android.support.v7.widget.RecyclerView>-->
-    <FrameLayout
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/detail_recycler_container"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_anchorGravity="bottom|right|end"
+        android:clipToPadding="false"
         android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </FrameLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_favorite"
+        style="@style/FabStyle"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:layout_anchor="@+id/app_bar_layout"
+        app:layout_anchorGravity="bottom|right|end"/>
 
 </android.support.design.widget.CoordinatorLayout>
 
