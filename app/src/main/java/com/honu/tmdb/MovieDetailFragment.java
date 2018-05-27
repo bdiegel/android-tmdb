@@ -258,12 +258,14 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                     Video trailer = trailers.get(position - 1);
                     MovieTrailerViewHolder trailerViewHolder = (MovieTrailerViewHolder) holder;
                     trailerViewHolder.videoTitle.setText(trailer.getName());
+                    Log.d(TAG, "Adding trailer: " + trailer.getName());
                     break;
                 case REVIEW_VIEW_TYPE:
                     Review review = reviews.get(position - trailers.size() - 1);
                     MovieReviewViewHolder reviewViewHolder = (MovieReviewViewHolder) holder;
                     reviewViewHolder.author.setText(review.getAuthor());
                     reviewViewHolder.content.setText("\"" + review.getContent() + "\"");
+                    Log.d(TAG, "Adding review: " + review.getAuthor());
                     break;
             }
         }
