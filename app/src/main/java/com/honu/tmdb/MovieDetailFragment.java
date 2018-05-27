@@ -38,7 +38,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -59,7 +59,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
     MenuItem mShareMenuItem;
 
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView mRecyclerView;
 
     public static MovieDetailFragment newInstance(Movie movie) {
@@ -245,7 +245,7 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
                 case HEADER_VIEW_TYPE:
                     MovieHeaderViewHolder headerViewHolder = (MovieHeaderViewHolder) holder;
                     int screenWidth = getResources().getDisplayMetrics().widthPixels;
-                    Picasso.with(headerViewHolder.posterView.getContext())
+                    Picasso.get()
                           .load(mMovie.getPosterUrl(screenWidth))
                           .placeholder(R.drawable.ic_local_movies_white_36dp)
                           .into(headerViewHolder.posterView);
@@ -294,19 +294,19 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
         class MovieHeaderViewHolder extends RecyclerView.ViewHolder {
 
-            @Bind(R.id.movie_detail_poster)
+            @BindView(R.id.movie_detail_poster)
             ImageView posterView;
 
-            @Bind(R.id.movie_detail_rating)
+            @BindView(R.id.movie_detail_rating)
             TextView ratingView;
 
-            @Bind(R.id.movie_detail_release)
+            @BindView(R.id.movie_detail_release)
             TextView releaseView;
 
-            @Bind(R.id.movie_detail_synopsis)
+            @BindView(R.id.movie_detail_synopsis)
             TextView synopsisView;
 
-            @Bind(R.id.movie_genres)
+            @BindView(R.id.movie_genres)
             TextView genres;
 
             public MovieHeaderViewHolder(View itemView) {
@@ -317,10 +317,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
         class MovieTrailerViewHolder extends RecyclerView.ViewHolder {
 
-            @Bind(R.id.video_name)
+            @BindView(R.id.video_name)
             TextView videoTitle;
 
-            @Bind(R.id.view_play_button)
+            @BindView(R.id.view_play_button)
             ImageButton playButton;
 
             public MovieTrailerViewHolder(View itemView) {
@@ -339,10 +339,10 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
         class MovieReviewViewHolder extends RecyclerView.ViewHolder {
 
-            @Bind(R.id.review_author)
+            @BindView(R.id.review_author)
             TextView author;
 
-            @Bind(R.id.review_content)
+            @BindView(R.id.review_content)
             TextView content;
 
             public MovieReviewViewHolder(View itemView) {

@@ -34,7 +34,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -47,7 +47,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     static final String KEY_MOVIES = "movies";
 
-    @Bind(R.id.recycler_container)
+    @BindView(R.id.grid_recycler_container)
     RecyclerView mRecyclerView;
 
     Spinner mSortSpinner;
@@ -67,16 +67,18 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     // communicates selection events back to listener
     OnMovieSelectedListener mListener;
 
+
     // interface to communicate movie selection events to MainActivity
     public interface OnMovieSelectedListener {
         //public void onMovieSelected(Movie selection, boolean onClick);
         public void onMovieSelected(Movie selection, boolean onClick, View view);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.movie_poster_grid, null);
+        View view = inflater.inflate(R.layout.movie_poster_grid, container, false);
         ButterKnife.bind(this, view);
 
         ArrayList<Movie> movies = new ArrayList<>();
@@ -127,6 +129,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         outState.putParcelableArrayList(KEY_MOVIES, mAdapter.data);
         super.onSaveInstanceState(outState);
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -377,7 +380,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             holder.movieTitle.setText(movie.getTitle());
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
             //Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
-            Picasso.with(holder.moviePoster.getContext())
+            Picasso.get()
                   .load(movie.getPosterUrl(screenWidth))
                   .placeholder(R.drawable.ic_local_movies_white_36dp)
                   .error(R.drawable.ic_local_movies_white_36dp)
@@ -397,10 +400,10 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         class MovieGridItemViewHolder extends RecyclerView.ViewHolder {
 
-            @Bind(R.id.movie_title)
+            @BindView(R.id.movie_title)
             TextView movieTitle;
 
-            @Bind(R.id.movie_poster)
+            @BindView(R.id.movie_poster)
             ImageView moviePoster;
 
             public MovieGridItemViewHolder(View itemView) {

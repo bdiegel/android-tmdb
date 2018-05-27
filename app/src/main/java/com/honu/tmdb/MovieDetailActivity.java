@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import com.honu.tmdb.rest.Movie;
 import com.squareup.picasso.Picasso;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -34,10 +34,10 @@ public class MovieDetailActivity extends AppCompatActivity  {
 
     boolean mIsFavorite = false;
 
-    @Bind(R.id.movie_detail_backdrop)
+    @BindView(R.id.movie_detail_backdrop)
     ImageView mBackdropView;
 
-    @Bind(R.id.fab_favorite)
+    @BindView(R.id.fab_favorite)
     FloatingActionButton mFavoriteFab;
 
     @Override
@@ -61,12 +61,12 @@ public class MovieDetailActivity extends AppCompatActivity  {
             Fragment fragment = MovieDetailFragment.newInstance(mMovie);
             fragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.recycler_container, fragment).commit();
+            transaction.replace(R.id.detail_recycler_container, fragment).commit();
         }
 
         // bind data to the app bar
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        Picasso.with(this).load(mMovie.getBackdropUrl(screenWidth)).into(mBackdropView);
+        Picasso.get().load(mMovie.getBackdropUrl(screenWidth)).into(mBackdropView);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) this.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mMovie.getTitle());
         mIsFavorite = MovieFavorites.isFavoriteMovie(this, mMovie.getId());

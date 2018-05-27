@@ -17,9 +17,10 @@ import android.widget.TextView;
 
 import com.honu.tmdb.rest.Movie;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 public class MainActivity extends AppCompatActivity implements  MoviePosterGridFragment.OnMovieSelectedListener {
 
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
     Movie mSelectedMovie;
 
     @Nullable
-    @Bind(R.id.fab_favorite)
+    @BindView(R.id.fab_favorite)
     FloatingActionButton mFavoriteFab;
 
     @Override
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements  MoviePosterGridF
         //this.startActivity(intent, options);
     }
 
-    @Nullable @OnClick(R.id.fab_favorite) void onFavoriteClicked() {
+    @Optional @OnClick(R.id.fab_favorite) void onFavoriteClicked() {
         toggleFavorite();
     }
 
