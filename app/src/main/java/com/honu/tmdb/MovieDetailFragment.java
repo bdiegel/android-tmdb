@@ -1,10 +1,7 @@
 package com.honu.tmdb;
 
 import android.annotation.TargetApi;
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,7 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.honu.tmdb.data.MovieContract;
+import com.honu.tmdb.data.MovieDatabase;
+import com.honu.tmdb.data.MovieRepository;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.Review;
@@ -37,6 +35,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -190,13 +189,24 @@ public class MovieDetailFragment extends Fragment {
 
         if (mMovie.getGenreIds().length == 0 && MovieFavorites.isFavoriteMovie(getActivity(), mMovie.getId())) {
 
-            GenresQueryHandler handler = new GenresQueryHandler(getActivity().getContentResolver());
-
-            handler.startQuery(5, null, MovieContract.MovieGenreEntry.CONTENT_URI,
-                  new String[]{"*"},
-                  MovieContract.MovieGenreEntry.WHERE_MOVIE_ID,
-                  new String[]{""+mMovie.getId()},
-                  null
+            // @TODO - query genres / update adpater
+            Executors.newSingleThreadExecutor().execute(
+                  new Runnable() {
+                    @Override
+                    public void run() {
+                        MovieDatabase movieDatabase = MovieDatabase.getInstance(MovieDetailFragment.this.getActivity().getApplication());
+                        MovieRepository repository = new MovieRepository(movieDatabase);
+                        List<Integer> genreIds = repository.getGenreIds(mMovie.getId());
+                        //mMovie.setGenreIds(genreIds);
+                        int[] ids = new int[genreIds.size()];
+                        int i = 0;
+                        for (Integer genreId : genreIds) {
+                            ids[i++] = genreId;
+                        }
+                        mMovie.setGenreIds(ids);
+                        mAdapter.updateGenres();
+                    }
+                }
             );
         }
     }
@@ -382,30 +392,5 @@ public class MovieDetailFragment extends Fragment {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(review.getUrl())));
             }
         }
-    }
-
-    class GenresQueryHandler extends AsyncQueryHandler {
-
-        public GenresQueryHandler(ContentResolver cr) {
-            super(cr);
-        }
-
-        @Override
-        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            Log.d(TAG, "Genres query returned cursor: " + cursor.getCount());
-            int[] genreIds = new int[cursor.getCount()];
-
-            int i = 0;
-            if (cursor != null && cursor.getCount() > 0) {
-                while (cursor.moveToNext()) {
-                    int id = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieGenreEntry.COLUMN_GENRE_ID));
-                    genreIds[i++] = id;
-                }
-                cursor.close();
-                mMovie.setGenreIds(genreIds);
-                mAdapter.updateGenres();
-            }
-        }
-
     }
 }

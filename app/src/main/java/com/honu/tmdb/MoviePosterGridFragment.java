@@ -1,13 +1,12 @@
 package com.honu.tmdb;
 
 import android.app.Activity;
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.honu.tmdb.data.MovieContract;
+import com.honu.tmdb.data.MovieDatabase;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.MovieListResponse;
@@ -33,6 +32,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,12 +84,12 @@ public class MoviePosterGridFragment extends Fragment {
 
         @Override
         public void success(MovieResponse response) {
-            success(response);
+            onSuccess(response);
         }
 
         @Override
         public void error(ApiError error) {
-            error(error);
+            onError(error);
         }
     };
 
@@ -272,12 +272,24 @@ public class MoviePosterGridFragment extends Fragment {
         } else {
             Log.d(TAG, "Query favorites (offline mode)");
             mAdapter.clearData();
-            FavoritesQueryHandler handler = new FavoritesQueryHandler(getActivity().getContentResolver());
-            handler.startQuery(1, null, MovieContract.MovieEntry.CONTENT_URI,
-                  new String[]{"*"},
-                  MovieContract.MovieEntry.SELECT_FAVORITES,
-                  null,
-                  null
+
+            // @TODO - query  favorites / update adapter
+            Executors.newSingleThreadExecutor().execute(
+                  new Runnable() {
+                      @Override
+                      public void run() {
+                          final List<Movie> favorites = MovieDatabase.getInstance(MoviePosterGridFragment.this.getActivity()).movieDao().getAllMovies();
+                          Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+                          mainThreadHandler.post(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mAdapter.setData(favorites);
+                                    }
+                                }
+                          );
+                      }
+                  }
             );
         }
     }
@@ -497,28 +509,5 @@ public class MoviePosterGridFragment extends Fragment {
                 }
             }
         }
-    }
-
-    class FavoritesQueryHandler extends AsyncQueryHandler {
-
-        public FavoritesQueryHandler(ContentResolver cr) {
-            super(cr);
-        }
-
-        @Override
-        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            List<Movie> favorites = new ArrayList<Movie>();
-
-            if (cursor != null && cursor.getCount() > 0) {
-                while (cursor.moveToNext()) {
-                    Movie movie = Movie.createFromCursor(cursor);
-                    favorites.add(movie);
-                }
-                cursor.close();
-            }
-
-            mAdapter.setData(favorites);
-        }
-
     }
 }

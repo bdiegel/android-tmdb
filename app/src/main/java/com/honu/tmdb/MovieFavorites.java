@@ -1,19 +1,16 @@
 package com.honu.tmdb;
 
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.util.Log;
 
-import com.honu.tmdb.data.MovieContract;
+import com.honu.tmdb.data.MovieDatabase;
+import com.honu.tmdb.rest.Genre;
 import com.honu.tmdb.rest.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 /**
  * Caches ids of favorite movies and persists them to SharedPreferences
@@ -82,75 +79,36 @@ public final class MovieFavorites {
         }
     }
 
-    public static void updateFavorite(Context context, boolean isFavorite, Movie movie) {
+    public static void updateFavorite(final Context context, boolean isFavorite, final Movie movie) {
         if (isFavorite) {
             addFavoriteMovie(context, movie.getId());
-            addFavorite(context, movie);
+
+            // @TODO: addFavorite(context, movie);
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    MovieDatabase.getInstance(context).movieDao().insertMovie(movie);
+                    // add genres
+                    List<Genre> genres = new ArrayList<>();
+                    for (int id : movie.getGenreIds()) {
+                        Genre genre = new Genre(id, movie.getId());
+                        genres.add(genre);
+                    }
+                    MovieDatabase.getInstance(context).movieDao().insertAllGenres(genres);
+                }
+            });
         } else {
             removeFavoriteMovie(context, movie.getId());
-            removeFavorite(context, movie);
+
+            // @TODO: removeFavorite(context, movie);
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    MovieDatabase.getInstance(context).movieDao().deleteMovie(movie);
+                    MovieDatabase.getInstance(context).movieDao().deleteGenres(movie.getId());
+                }
+            });
         }
-    }
-
-    public static void addFavorite(Context context, Movie movie) {
-        Log.d(TAG, "Inserting favorite: " + movie.getTitle());
-
-        ContentValues values = new ContentValues();
-        values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
-        values.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
-        values.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
-        values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-        values.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-        values.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        values.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
-        values.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
-        values.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
-        values.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
-        values.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
-        values.put(MovieContract.MovieEntry.COLUMN_LANGUAGE, movie.getOriginalLanguage());
-        values.put(MovieContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
-        values.put(MovieContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
-
-        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
-        handler.startInsert(2, null, MovieContract.MovieEntry.CONTENT_URI, values);
-
-        // update genres
-        insertGenres(context, movie.getId(), movie.getGenreIds());
-    }
-
-    protected static void insertGenres(final Context context, int movieId, int[] genreIds) {
-
-        final ContentValues[] allValues = new ContentValues[genreIds.length];
-        for (int i=0; i<genreIds.length; i++) {
-            ContentValues  values = new ContentValues();
-            values.put(MovieContract.MovieGenreEntry.COLUMN_MOVIE_ID, movieId);
-            values.put(MovieContract.MovieGenreEntry.COLUMN_GENRE_ID, genreIds[i]);
-            allValues[i] = values;
-        }
-
-        // wtf: no bulkInsert for AsyncQueryHandler
-        new Thread(new Runnable() {
-            public void run() {
-                context.getContentResolver().bulkInsert(MovieContract.MovieGenreEntry.CONTENT_URI, allValues);
-            }
-        }).start();
-    }
-
-    protected static void deleteGenres(Context context, int movidId) {
-        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
-        handler.startDelete(3, null,
-              MovieContract.MovieGenreEntry.CONTENT_URI,
-              MovieContract.MovieGenreEntry.WHERE_MOVIE_ID,
-              new String[] {""+movidId});
-    }
-
-    public static void removeFavorite(Context context, Movie movie) {
-        Log.d(TAG, "Removing favorite: " + movie.getTitle());
-        final AsyncQueryHandler handler = new AsyncCrudHandler(context.getContentResolver());
-        handler.startDelete(2, null,
-              MovieContract.MovieEntry.CONTENT_URI,
-              MovieContract.MovieEntry.WHERE_MOVIE_ID,
-              new String[]{"" + movie.getId()});
     }
 
     public static int getImageResourceId(boolean isFavorite) {
@@ -158,23 +116,5 @@ public final class MovieFavorites {
             return IMG_RESOURCE_IS_FAVORITE;
         }
         return IMG_RESOURCE_NOT_FAVORITE;
-    }
-
-    static class AsyncCrudHandler extends AsyncQueryHandler {
-        public AsyncCrudHandler(ContentResolver cr) {
-            super(cr);
-        }
-
-        @Override
-        protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            super.onInsertComplete(token, cookie, uri);
-            Log.d(TAG, "Insert completed for uri: " + uri);
-        }
-
-        @Override
-        protected void onDeleteComplete(int token, Object cookie, int result) {
-            super.onDeleteComplete(token, cookie, result);
-            Log.d(TAG, "Delete completed with result: " + result);
-        }
     }
 }

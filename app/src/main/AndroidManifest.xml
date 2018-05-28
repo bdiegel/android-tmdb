@@ -32,14 +32,6 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/SettingsTheme" >
         </activity>
-
-        <provider
-            android:name=".data.MovieProvider"
-            android:authorities="com.honu.tmdb"
-            android:enabled="true"
-            android:exported="false"
-            android:syncable="false">
-        </provider>
     </application>
 
 </manifest>

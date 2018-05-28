@@ -1,60 +1,79 @@
 package com.honu.tmdb.rest;
 
-import android.database.Cursor;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 import com.honu.tmdb.MovieGenre;
-import com.honu.tmdb.data.MovieContract;
 
 import java.util.ArrayList;
 import java.util.List;
 
+//import com.honu.tmdb.data.MovieContract;
+
 /**
  *
  */
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
+    @PrimaryKey
+    @ColumnInfo(name = "movie_id")
     @SerializedName("id")
     int id;
 
+    @ColumnInfo(name = "adult")
     @SerializedName("adult")
     boolean isAdult;
 
+    @ColumnInfo(name = "backdrop_path")
     @SerializedName("backdrop_path")
     String backdropPath;
 
+    @Ignore
     @SerializedName("genre_ids")
     int[] genreIds = new int[0];
 
     @SerializedName("original_language")
     String originalLanguage;
 
+    @ColumnInfo(name = "original_title")
     @SerializedName("original_title")
     String originalTitle;
 
+    @ColumnInfo(name = "overview")
     @SerializedName("overview")
     String overview;
 
+    @ColumnInfo(name = "release")
     @SerializedName("release_date")
     String releaseDate;
 
+    @ColumnInfo(name = "poster_path")
     @SerializedName("poster_path")
     String posterPath;
 
+    @ColumnInfo(name = "popularity")
     @SerializedName("popularity")
     float popularity;
 
+    @ColumnInfo(name = "title")
     @SerializedName("title")
     String title;
 
+    @ColumnInfo(name = "video")
     @SerializedName("video")
     boolean isVideo;
 
+    @ColumnInfo(name = "vote_average")
     @SerializedName("vote_average")
     float voteAverage;
 
+    @ColumnInfo(name = "vote_count")
     @SerializedName("vote_count")
     int voteCount;
 
@@ -78,7 +97,26 @@ public class Movie implements Parcelable {
     // recommended for most phones:
     static final String SIZE_DEFAULT = POSTER_SIZE_W185;
 
+    @Ignore
     public Movie() {
+    }
+
+    public Movie(int id, boolean isAdult, String backdropPath, String originalLanguage, String originalTitle,
+                 String overview, String releaseDate, String posterPath, float popularity, String title,
+                 boolean isVideo, float voteAverage, int voteCount) {
+        this.id = id;
+        this.isAdult = isAdult;
+        this.backdropPath = backdropPath;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
+        this.popularity = popularity;
+        this.title = title;
+        this.isVideo = isVideo;
+        this.voteAverage = voteAverage;
+        this.voteCount = voteCount;
     }
 
     public int getId() {
@@ -215,23 +253,6 @@ public class Movie implements Parcelable {
         this.voteCount = in.readInt();
     }
 
-    protected Movie(Cursor cursor) {
-        this.id = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
-        this.isAdult = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ADULT)) == 1;
-        this.backdropPath = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH));
-        this.originalLanguage = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_LANGUAGE));
-        this.originalTitle = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE));
-        this.overview = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW));
-        this.releaseDate = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE));
-        this.posterPath = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH));
-        this.popularity = cursor.getFloat(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POPULARITY));
-        this.title = cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
-        this.isVideo = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VIDEO)) == 1;
-        this.voteAverage = cursor.getFloat(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE));
-        this.voteCount = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_COUNT));
-        this.genreIds = new int[]{};
-    }
-
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         public Movie createFromParcel(Parcel source) {
             return new Movie(source);
@@ -241,8 +262,4 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
-
-    public static Movie createFromCursor(Cursor cursor) {
-        return new Movie(cursor);
-    }
 }

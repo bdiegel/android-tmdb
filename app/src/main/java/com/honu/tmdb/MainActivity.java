@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Optional;
 
-public class MainActivity extends AppCompatActivity implements  MoviePosterGridFragment.OnMovieSelectedListener {
+public class MainActivity extends AppCompatActivity implements MoviePosterGridFragment.OnMovieSelectedListener {
 
     static final String TAG = MainActivity.class.getSimpleName();
 
