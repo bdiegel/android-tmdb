@@ -75,7 +75,6 @@ public class MovieDbApi {
     }
 
     public void requestHighestRatedMovies(int page, @Nullable final MovieListener<MovieListResponse> listener) {
-
         getMovieService().fetchHighestRatedMovies(page).enqueue(new MovieCallback("requestHighestRatedMovies", listener));
     }
 

@@ -65,7 +65,7 @@
         <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
         <!-->-->
     <!--</android.support.v7.widget.RecyclerView>-->
-    <android.support.v4.widget.NestedScrollView
+    <FrameLayout
         android:id="@+id/detail_recycler_container"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_anchorGravity="bottom|right|end"
@@ -74,7 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </android.support.v4.widget.NestedScrollView>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_favorite"
