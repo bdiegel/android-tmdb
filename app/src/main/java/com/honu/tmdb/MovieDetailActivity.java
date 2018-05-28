@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -101,7 +102,7 @@ public class MovieDetailActivity extends AppCompatActivity  {
 
         // handle back arrow in toolbar:
         if (id == android.R.id.home) {
-            finish();
+            onBackPressed();
             return true;
         }
 
@@ -122,5 +123,19 @@ public class MovieDetailActivity extends AppCompatActivity  {
         mIsFavorite = !mIsFavorite;
         mFavoriteFab.setImageResource(MovieFavorites.getImageResourceId(mIsFavorite));
         MovieFavorites.updateFavorite(this, mIsFavorite, mMovie);
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mFavoriteFab.getLayoutParams();
+        params.setBehavior(null);
+        mFavoriteFab.requestLayout();
+        mFavoriteFab.setVisibility(View.GONE);
     }
 }
