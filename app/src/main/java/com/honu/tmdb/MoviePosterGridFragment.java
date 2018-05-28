@@ -41,7 +41,7 @@ import butterknife.OnClick;
 /**
  * Fragment displays grid of movie posters using recycler view
  */
-public class MoviePosterGridFragment extends Fragment implements MovieDbApi.MovieListListener, MovieDbApi.MovieListener {
+public class MoviePosterGridFragment extends Fragment {
 
     static final String TAG = MoviePosterGridFragment.class.getSimpleName();
 
@@ -66,6 +66,32 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
     // communicates selection events back to listener
     OnMovieSelectedListener mListener;
+
+    MovieDbApi.MovieListener<MovieListResponse> movieListListener = new MovieDbApi.MovieListener<MovieListResponse>() {
+
+        @Override
+        public void success(MovieListResponse response) {
+            onSuccess(response);
+        }
+
+        @Override
+        public void error(ApiError error) {
+            onError(error);
+        }
+    };
+
+    MovieDbApi.MovieListener<MovieResponse> movieListener = new MovieDbApi.MovieListener<MovieResponse>() {
+
+        @Override
+        public void success(MovieResponse response) {
+            success(response);
+        }
+
+        @Override
+        public void error(ApiError error) {
+            error(error);
+        }
+    };
 
 
     // interface to communicate movie selection events to MainActivity
@@ -104,9 +130,9 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         // request movies
         if (mAdapter.getItemCount() == 0) {
             if (mSortMethod == SortOption.POPULARITY) {
-                mApi.requestMostPopularMovies(this);
+                mApi.requestMostPopularMovies(movieListListener);
             } else {
-                mApi.requestHighestRatedMovies(this);
+                mApi.requestHighestRatedMovies(movieListListener);
             }
         }
 
@@ -180,8 +206,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
     }
 
 
-    @Override
-    public void success(MovieListResponse response) {
+    private void onSuccess(MovieListResponse response) {
 
         if (response.getPage() == 1) {
             // initialize with results for first page
@@ -194,13 +219,11 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
         }
     }
 
-    @Override
-    public void success(MovieResponse response) {
+    private void onSuccess(MovieResponse response) {
         mAdapter.appendData(response.getMovie());
     }
 
-    @Override
-    public void error(ApiError error) {
+    private void onError(ApiError error) {
         if (error.isNetworkError()) {
             Toast.makeText(getActivity(), "Unable to connect to remote host", Toast.LENGTH_LONG).show();
         }
@@ -217,10 +240,10 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         switch (mSortMethod) {
             case SortOption.POPULARITY:
-                mApi.requestMostPopularMovies(this);
+                mApi.requestMostPopularMovies(movieListListener);
                 return;
             case SortOption.RATING:
-                mApi.requestHighestRatedMovies(this);
+                mApi.requestHighestRatedMovies(movieListListener);
                 return;
             case SortOption.FAVORITE:
                 queryFavorites();
@@ -244,7 +267,7 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
             mAdapter.clearData();
             List<Integer> favoriteIds = MovieFavorites.getFavoriteMovies(getActivity());
             for (int favoriteId : favoriteIds) {
-                mApi.requestMovie(favoriteId, this);
+                mApi.requestMovie(favoriteId, movieListener);
             }
         } else {
             Log.d(TAG, "Query favorites (offline mode)");
@@ -264,10 +287,10 @@ public class MoviePosterGridFragment extends Fragment implements MovieDbApi.Movi
 
         switch (mSortMethod) {
             case SortOption.POPULARITY:
-                mApi.requestMostPopularMovies(page, this);
+                mApi.requestMostPopularMovies(page, movieListListener);
                 return;
             case SortOption.RATING:
-                mApi.requestHighestRatedMovies(page, this);
+                mApi.requestHighestRatedMovies(page, movieListListener);
                 return;
             default:
                 return;

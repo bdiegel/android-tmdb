@@ -1,9 +1,9 @@
 package com.honu.tmdb.rest;
 
-import retrofit.Callback;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Defines selected services from TMDb API
@@ -13,40 +13,30 @@ import retrofit.http.Query;
 public interface MovieService {
 
     // Top 20 movies sorted by specified criteria
-    @GET("/discover/movie")
-    void discoverMovies(@Query("sort_by") String sortBy, @Query("api_key") String apiKey, Callback<MovieListResponse> cb);
-
-    // Top 20 sorted by popularity
-    //@GET("/discover/movie?sort_by=popularity.desc")
-    @GET("/movie/popular")
-    void fetchPopularMovies(@Query("api_key") String apiKey, Callback<MovieListResponse> cb);
+    @GET("discover/movie")
+    Call<MovieListResponse> discoverMovies(@Query("sort_by") String sortBy);
 
     // Next page of 20 sorted by popularity
     //@GET("/discover/movie?sort_by=popularity.desc")
-    @GET("/movie/popular")
-    void fetchPopularMovies(@Query("api_key") String apiKey, @Query("page") int page, Callback<MovieListResponse> cb);
-
-    // Top 20 sorted by rating
-    // @GET("/discover/movie?sort_by=vote_average.desc")
-    @GET("/movie/top_rated")
-    void fetchHighestRatedMovies(@Query("api_key") String apiKey, Callback<MovieListResponse> cb);
+    @GET("movie/popular")
+    Call<MovieListResponse> fetchPopularMovies(@Query("page") Integer page);
 
     // Next page of 20 sorted by rating
     //@GET("/discover/movie?sort_by=vote_average.desc")
-    @GET("/movie/top_rated")
-    void fetchHighestRatedMovies(@Query("api_key") String apiKey, @Query("page") int page, Callback<MovieListResponse> cb);
+    @GET("movie/top_rated")
+    Call<MovieListResponse> fetchHighestRatedMovies(@Query("page") Integer page);
 
     // Get movie details by id
-    @GET("/movie/{id}")
-    void fetchMovie(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<MovieResponse> cb);
+    @GET("movie/{id}")
+    Call<MovieResponse> fetchMovie(@Path("id") int movieId);
 
     // Video trailers, clips, etc
-    @GET("/movie/{id}/videos")
-    void fetchVideos(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<VideoResponse> cb);
+    @GET("movie/{id}/videos")
+    Call<VideoResponse> fetchVideos(@Path("id") int movieId);
 
     // Movie reviews
-    @GET("/movie/{id}/reviews")
-    void fetchReviews(@Path("id") int movieId, @Query("api_key") String apiKey, Callback<ReviewResponse> cb);
+    @GET("movie/{id}/reviews")
+    Call<ReviewResponse> fetchReviews(@Path("id") int movieId);
 
     // http://api.themoviedb.org/3/movie/{movie_id}?api_key=your_key&append_to_response=trailers,reviews
 }

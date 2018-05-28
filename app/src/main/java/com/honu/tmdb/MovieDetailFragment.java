@@ -43,7 +43,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewListener, MovieDbApi.VideoListener {
+public class MovieDetailFragment extends Fragment {
 
     static final String TAG = MovieDetailFragment.class.getSimpleName();
 
@@ -61,6 +61,32 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
 
     @BindView(R.id.recycler)
     RecyclerView mRecyclerView;
+
+    MovieDbApi.MovieListener<ReviewResponse> reviewListener = new MovieDbApi.MovieListener<ReviewResponse>() {
+
+        @Override
+        public void success(ReviewResponse response) {
+            onSuccess(response);
+        }
+
+        @Override
+        public void error(ApiError error) {
+            onError(error);
+        }
+    };
+
+    MovieDbApi.MovieListener<VideoResponse> videoListener = new MovieDbApi.MovieListener<VideoResponse>() {
+
+        @Override
+        public void success(VideoResponse response) {
+            onSuccess(response);
+        }
+
+        @Override
+        public void error(ApiError error) {
+            onError(error);
+        }
+    };
 
     public static MovieDetailFragment newInstance(Movie movie) {
         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -95,8 +121,8 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         if (mMovie != null) {
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
-            mApi.requestMovieReviews(mMovie.getId(), this);
-            mApi.requestMovieVideos(mMovie.getId(), this);
+            mApi.requestMovieReviews(mMovie.getId(), reviewListener);
+            mApi.requestMovieVideos(mMovie.getId(), videoListener);
             queryGenres();
         }
 
@@ -128,22 +154,19 @@ public class MovieDetailFragment extends Fragment implements MovieDbApi.ReviewLi
         });
     }
 
-    @Override
-    public void success(ReviewResponse response) {
+    private void onSuccess(ReviewResponse response) {
         List<Review> reviews = response.getReviews();
         Log.d(TAG, "Number of reviews: " + reviews.size());
         mAdapter.setReviews(reviews);
     }
 
-    @Override
-    public void success(VideoResponse response) {
+    private void onSuccess(VideoResponse response) {
         List<Video> trailers = response.getYoutubeTrailers();
         Log.d(TAG, "Number of YouTube trailers: " + trailers.size());
         mAdapter.setTrailers(trailers);
     }
 
-    @Override
-    public void error(ApiError error) {
+    private void onError(ApiError error) {
         Log.e(TAG, "Error retrieving data from API: " + error.getReason());
     }
 

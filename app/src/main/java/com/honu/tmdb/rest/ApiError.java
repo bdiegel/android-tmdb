@@ -1,8 +1,5 @@
 package com.honu.tmdb.rest;
 
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 /**
  *
  */
@@ -23,20 +20,19 @@ public class ApiError {
         this.message = exception.getMessage();
     }
 
-
-    public ApiError(RetrofitError error) {
+    public ApiError(Throwable error) {
+        // @TODO
         // no network connection, timeout, other IOException
-        if (error.getKind().equals(RetrofitError.Kind.NETWORK)) {
-            isNetworkError = true;
-        }
+//        if (error.getKind().equals(RetrofitError.Kind.NETWORK)) {
+//            isNetworkError = true;
+//        }
         message = error.getMessage();
-        Response response = error.getResponse();
-        if (response != null) {
-            this.statusCode = response.getStatus();
-            this.reason = response.getReason();
-        }
+//        Response response = error.getResponse();
+//        if (response != null) {
+//            this.statusCode = response.getStatus();
+//            this.reason = response.getReason();
+//        }
     }
-
 
     public int getStatusCode() {
         return statusCode;
