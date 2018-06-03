@@ -1,5 +1,7 @@
 package com.honu.tmdb.data;
 
+import android.arch.lifecycle.LiveData;
+
 import com.honu.tmdb.rest.Genre;
 import com.honu.tmdb.rest.Movie;
 
@@ -16,15 +18,15 @@ public class MovieRepository {
         mMovieDatabase = movieDatabase;
     }
 
-    public List<Movie> getMovies() {
+    public LiveData<List<Movie>> getMovies() {
         return mMovieDatabase.movieDao().getAllMovies();
     }
 
-    public List<Integer> getGenreIds(int movie_id) {
+    public LiveData<List<Integer>> getGenreIds(int movie_id) {
         return mMovieDatabase.movieDao().getGenreIds(movie_id);
     }
 
-    public List<Genre> getGenres(int movie_id) {
+    public LiveData<List<Genre>> getGenres(int movie_id) {
         return mMovieDatabase.movieDao().getGenres(movie_id);
     }
 }

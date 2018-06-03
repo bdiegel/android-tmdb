@@ -1,12 +1,13 @@
 package com.honu.tmdb;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,16 +24,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.honu.tmdb.data.MovieDatabase;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.MovieListResponse;
 import com.honu.tmdb.rest.MovieResponse;
+import com.honu.tmdb.viewmodels.MainViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -273,24 +273,15 @@ public class MoviePosterGridFragment extends Fragment {
             Log.d(TAG, "Query favorites (offline mode)");
             mAdapter.clearData();
 
-            // @TODO - query  favorites / update adapter
-            Executors.newSingleThreadExecutor().execute(
-                  new Runnable() {
-                      @Override
-                      public void run() {
-                          final List<Movie> favorites = MovieDatabase.getInstance(MoviePosterGridFragment.this.getActivity()).movieDao().getAllMovies();
-                          Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-                          mainThreadHandler.post(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mAdapter.setData(favorites);
-                                    }
-                                }
-                          );
-                      }
-                  }
-            );
+            // query  viewmodel for favorites
+            MainViewModel mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+            mainViewModel.getFavorites().observe(MoviePosterGridFragment.this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(@Nullable final List<Movie> movies) {
+                    mAdapter.setData(movies);
+                }
+            });
+
         }
     }
 
@@ -339,7 +330,9 @@ public class MoviePosterGridFragment extends Fragment {
 
         public void setData(List<Movie> data) {
             this.data.clear();
-            this.data.addAll(data);
+            if (data !=null && data.size() > 0) {
+                this.data.addAll(data);
+            }
             this.notifyDataSetChanged();
             notifyMovieSelectionListener();
         }

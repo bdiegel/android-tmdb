@@ -1,5 +1,6 @@
 package com.honu.tmdb.data;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -18,10 +19,8 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface MovieDao {
 
-    // Retrieve a single Movie by its id
     @Query("SELECT * FROM movie WHERE movie_id = :movie_id")
-//    LiveData<Movie> getMovieById(int movie_id);
-    Movie getMovieById(int movie_id);
+    LiveData<Movie> getMovieById(int movie_id);
 
     @Insert(onConflict = REPLACE)
     void insertMovie(Movie movie);
@@ -29,18 +28,14 @@ public interface MovieDao {
     @Delete
     void deleteMovie(Movie movie);
 
-    // Retrieve all User objects
     @Query("SELECT * FROM movie")
-//    LiveData<List<Movie>> getAllMovies();
-    List<Movie> getAllMovies();
+    LiveData<List<Movie>> getAllMovies();
 
     @Query("SELECT genre_id FROM movie_genre WHERE movie_id = :movie_id")
-//    LiveData<List<Integer>> getGenres(int movie_id);
-    List<Integer> getGenreIds(int movie_id);
+    LiveData<List<Integer>> getGenreIds(int movie_id);
 
     @Query("SELECT * FROM movie_genre WHERE movie_id = :movie_id")
-//    LiveData<List<Integer>> getGenres(int movie_id);
-    List<Genre> getGenres(int movie_id);
+    LiveData<List<Genre>> getGenres(int movie_id);
 
     @Insert(onConflict = REPLACE)
     void insertAllGenres(List<Genre> genresList);

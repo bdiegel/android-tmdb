@@ -1,10 +1,13 @@
 package com.honu.tmdb;
 
 import android.annotation.TargetApi;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,18 +27,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.honu.tmdb.data.MovieDatabase;
-import com.honu.tmdb.data.MovieRepository;
 import com.honu.tmdb.rest.ApiError;
 import com.honu.tmdb.rest.Movie;
 import com.honu.tmdb.rest.Review;
 import com.honu.tmdb.rest.ReviewResponse;
 import com.honu.tmdb.rest.Video;
 import com.honu.tmdb.rest.VideoResponse;
+import com.honu.tmdb.viewmodels.DetailViewModel;
+import com.honu.tmdb.viewmodels.DetailViewModelFactory;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -189,25 +192,24 @@ public class MovieDetailFragment extends Fragment {
 
         if (mMovie.getGenreIds().length == 0 && MovieFavorites.isFavoriteMovie(getActivity(), mMovie.getId())) {
 
-            // @TODO - query genres / update adpater
-            Executors.newSingleThreadExecutor().execute(
-                  new Runnable() {
-                    @Override
-                    public void run() {
-                        MovieDatabase movieDatabase = MovieDatabase.getInstance(MovieDetailFragment.this.getActivity().getApplication());
-                        MovieRepository repository = new MovieRepository(movieDatabase);
-                        List<Integer> genreIds = repository.getGenreIds(mMovie.getId());
-                        //mMovie.setGenreIds(genreIds);
-                        int[] ids = new int[genreIds.size()];
-                        int i = 0;
-                        for (Integer genreId : genreIds) {
-                            ids[i++] = genreId;
-                        }
-                        mMovie.setGenreIds(ids);
-                        mAdapter.updateGenres();
+            // query genre ids
+            MovieDatabase movieDatabase = MovieDatabase.getInstance(MovieDetailFragment.this.getActivity().getApplication());
+            DetailViewModelFactory detailViewModelFactory = new DetailViewModelFactory(movieDatabase, mMovie.getId());
+            final DetailViewModel detailViewModel = ViewModelProviders.of(getActivity(), detailViewModelFactory).get(DetailViewModel.class);
+
+            detailViewModel.getGenreIds().observe(MovieDetailFragment.this, new Observer<List<Integer>>() {
+                @Override
+                public void onChanged(@Nullable List<Integer> integers) {
+                    detailViewModel.getGenreIds().removeObserver(this);
+                    int[] ids = new int[integers.size()];
+                    int i = 0;
+                    for (Integer genreId : integers) {
+                        ids[i++] = genreId;
                     }
+                    mMovie.setGenreIds(ids);
+                    mAdapter.updateGenres();
                 }
-            );
+            });
         }
     }
 

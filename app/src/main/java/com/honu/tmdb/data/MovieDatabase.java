@@ -25,11 +25,9 @@ public abstract class MovieDatabase extends RoomDatabase {
         if (sInstance == null) {
             synchronized (MovieDatabase.class) {
                 if (sInstance == null) {
-
                     sInstance = Room.databaseBuilder(context.getApplicationContext(),
                           MovieDatabase.class, "movies.db")
                           .addMigrations(MIGRATION_1_2)
-//                          .allowMainThreadQueries() // @TODO: remove me
                           .build();
                 }
             }
